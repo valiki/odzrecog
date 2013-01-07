@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image;
+package by.sunnycore.recognition.image.splitter;
 
 import by.sunnycore.recognition.domain.ImageChannel;
 

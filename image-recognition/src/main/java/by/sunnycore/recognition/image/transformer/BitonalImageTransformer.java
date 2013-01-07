@@ -1,9 +1,8 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import by.sunnycore.recognition.image.IImageTransformer;
 
 public class BitonalImageTransformer implements IImageTransformer{
 

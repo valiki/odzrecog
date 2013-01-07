@@ -1,6 +1,5 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.filter;
 
-import by.sunnycore.recognition.image.IRawImageFilter;
 
 public class EqualRGBImageFilter implements IRawImageFilter{
 

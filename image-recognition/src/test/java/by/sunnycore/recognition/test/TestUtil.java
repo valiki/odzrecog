@@ -12,7 +12,7 @@ import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class TestUtil {
 
-	private static final String IMAGE_PATH = "images/0020.bmp";
+	private static final String IMAGE_PATH = "images/0020_equalized.png";
 	
 	public static BufferedImage loadImage() throws IOException{
 		return loadImage(IMAGE_PATH);
@@ -44,6 +44,7 @@ public class TestUtil {
 	public static void saveImageWithNewName(BufferedImage image,String what,String to) throws IOException{
 		String path = getImagePathString();
 		path = path.replaceAll(what, to);
+		System.out.println(path);
 		ImageUtil.saveImage((BufferedImage) image, new File(path), "png");
 	}
 	
@@ -68,7 +69,7 @@ public class TestUtil {
 			colors = c;
 		}
 		for(int i=0;i<data.length;i++){
-			result[i]= ChartUtil.buildChart(data[i], "Histogram"+colors[i], "colour", "number of dots", 400, 400);
+			result[i]= ChartUtil.buildChart(data[i], "Histogram"+colors[i], "colour", "number of dots", 400, 400,"line");
 		}
 		return result;
 	}

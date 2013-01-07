@@ -7,7 +7,8 @@ import javax.media.jai.operator.MedianFilterDescriptor;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.IImageFilter;
+import by.sunnycore.recognition.image.filter.IImageFilter;
+import by.sunnycore.recognition.image.filter.JAIMedianFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class MedianFilterTest {

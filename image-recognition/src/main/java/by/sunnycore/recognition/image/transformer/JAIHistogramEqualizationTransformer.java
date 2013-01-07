@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
@@ -10,7 +10,6 @@ import javax.media.jai.PlanarImage;
 import by.bsu.nummethods.IFunction;
 import by.bsu.nummethods.integrals.simpson.IIntegralCountMethod;
 import by.bsu.nummethods.integrals.simpson.TrapeziumIntegralCountMethod;
-import by.sunnycore.recognition.image.IImageTransformer;
 import by.sunnycore.recognition.image.util.JAIUtil;
 
 /**

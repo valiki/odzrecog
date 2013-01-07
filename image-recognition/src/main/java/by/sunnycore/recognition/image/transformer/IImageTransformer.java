@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.image.BufferedImage;
 

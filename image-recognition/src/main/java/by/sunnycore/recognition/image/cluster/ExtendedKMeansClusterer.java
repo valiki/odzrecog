@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.cluster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -11,7 +11,6 @@ import net.sf.javaml.clustering.KMeans;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.Instance;
 import by.sunnycore.recognition.domain.ObjectCluster;
-import by.sunnycore.recognition.image.IImageClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.image.util.JavaMlUtil;
 
@@ -27,7 +26,7 @@ import by.sunnycore.recognition.image.util.JavaMlUtil;
 public class ExtendedKMeansClusterer implements IImageClusterer {
 
 	private static final int MIN_CLUSTERS_NUMBER = 3;
-	private static final int MAX_CLUSTERS_NUMBER = 20;
+	private static final int MAX_CLUSTERS_NUMBER = 25;
 
 	private Logger logger = Logger.getLogger(ExtendedKMeansClusterer.class);
 	
@@ -42,9 +41,9 @@ public class ExtendedKMeansClusterer implements IImageClusterer {
 		pointsRGB[0] = new int[numberOfPixels];
 		pointsRGB[1] = new int[numberOfPixels];
 		pointsRGB[2] = new int[numberOfPixels];
-		for(int i=0;i<numberOfPixels;i=i+20){
-			pointsRGB[0][i]=ImageUtil.getRed(pixels[i], colorModel);
-			pointsRGB[1][i]=ImageUtil.getGreen(pixels[i], colorModel);
+		for(int i=0;i<numberOfPixels;i++){
+			pointsRGB[0][i]=ImageUtil.getRedRaw(pixels[i], colorModel);
+			pointsRGB[1][i]=ImageUtil.getGreenRaw(pixels[i], colorModel);
 			pointsRGB[2][i]=ImageUtil.getBlue(pixels[i], colorModel);
 		}
 		ObjectCluster[] theBestClusters = null;

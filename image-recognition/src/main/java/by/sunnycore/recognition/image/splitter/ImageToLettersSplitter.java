@@ -1,9 +1,8 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.splitter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import by.sunnycore.recognition.image.IRawImageSplitter;
 
 public class ImageToLettersSplitter implements IRawImageSplitter {
 

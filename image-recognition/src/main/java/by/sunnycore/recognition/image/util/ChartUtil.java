@@ -8,15 +8,15 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.DefaultXYDataset;
 
 public class ChartUtil {
-	public static BufferedImage buildChart(double[][] data,String title,String xl,String yl,int width,int height){
-		JFreeChart chart = buildChart(data, title, xl, yl);
+	public static BufferedImage buildChart(double[][] data,String title,String xl,String yl,int width,int height,final String type){
+		JFreeChart chart = buildChart(data, title, xl, yl,type);
 		return chart.createBufferedImage(width, height);
 	}
 
-	@SuppressWarnings("unchecked")
-	private static JFreeChart buildChart(double[][] data, String title,
-			String xl, String yl) {
+	private static JFreeChart buildChart(double[][] data,final String title,
+			String xl, String yl,String type) {
 		DefaultXYDataset dataset = new DefaultXYDataset();
+		@SuppressWarnings("rawtypes")
 		Comparable key = new Comparable() {
 			@Override
 			public int compareTo(Object o) {
@@ -24,15 +24,35 @@ public class ChartUtil {
 			}
 		};
 		dataset.addSeries(key, data);
-		JFreeChart chart = ChartFactory.createXYLineChart(
-				title, 
-				xl, 
-				yl, 
-				dataset, 
-				PlotOrientation.VERTICAL, 
-				false, 
-				true, 
-				false);
+		JFreeChart chart;
+		switch (type) {
+		case "line":
+			chart = ChartFactory.createXYLineChart(
+					title, 
+					xl, 
+					yl, 
+					dataset, 
+					PlotOrientation.VERTICAL, 
+					false, 
+					true, 
+					false);
+			break;
+		case "scatter":
+			chart = ChartFactory.createScatterPlot(title, xl, yl, dataset, PlotOrientation.VERTICAL, true, true, false);
+			break;
+		default:
+			chart = ChartFactory.createXYLineChart(
+					title, 
+					xl, 
+					yl, 
+					dataset, 
+					PlotOrientation.VERTICAL, 
+					false, 
+					true, 
+					false);
+			break;
+		}
+		
 		return chart;
 	}
 }

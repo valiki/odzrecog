@@ -5,7 +5,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.IImageFilter;
+import by.sunnycore.recognition.image.filter.IImageFilter;
+import by.sunnycore.recognition.image.filter.JAIFreiChenEdgeImageFilter;
+import by.sunnycore.recognition.image.filter.JAIPrewittEdgeImageFilter;
+import by.sunnycore.recognition.image.filter.JAIRobertsEdgeImageFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class JAIEdgeImageTransformerTest {

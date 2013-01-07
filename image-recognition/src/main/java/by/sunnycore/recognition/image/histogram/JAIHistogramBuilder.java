@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.histogram;
 
 import java.awt.image.BufferedImage;
 
@@ -7,7 +7,6 @@ import javax.media.jai.PlanarImage;
 
 import org.springframework.stereotype.Component;
 
-import by.sunnycore.recognition.image.IHistogramBuilder;
 import by.sunnycore.recognition.image.util.JAIUtil;
 /**
  * builds histogram from the image for the visualization

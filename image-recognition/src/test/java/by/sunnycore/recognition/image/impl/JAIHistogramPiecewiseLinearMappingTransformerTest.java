@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import by.sunnycore.recognition.image.transformer.JAIHistogramPiecewiseLinearMappingTransformer;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class JAIHistogramPiecewiseLinearMappingTransformerTest extends AbstractImageHistogramTransformerTest{

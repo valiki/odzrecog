@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.image.BufferedImage;
 
@@ -7,7 +7,6 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
-import by.sunnycore.recognition.image.IImageTransformer;
 
 /**
  * processes image resize 

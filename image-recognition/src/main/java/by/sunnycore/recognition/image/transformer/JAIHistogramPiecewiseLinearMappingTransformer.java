@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
@@ -7,7 +7,6 @@ import javax.media.jai.Histogram;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import by.sunnycore.recognition.image.IImageTransformer;
 import by.sunnycore.recognition.image.util.JAIUtil;
 
 public class JAIHistogramPiecewiseLinearMappingTransformer implements IImageTransformer {

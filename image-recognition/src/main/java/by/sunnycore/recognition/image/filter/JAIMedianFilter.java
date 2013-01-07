@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.filter;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
@@ -8,7 +8,6 @@ import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MedianFilterDescriptor;
 import javax.media.jai.operator.MedianFilterShape;
 
-import by.sunnycore.recognition.image.IImageFilter;
 
 public class JAIMedianFilter implements IImageFilter {
 

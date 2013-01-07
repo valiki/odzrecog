@@ -1,9 +1,8 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.filter;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import by.sunnycore.recognition.image.IImageFilter;
 
 public class RGBToGrayImageFilter implements IImageFilter{
 

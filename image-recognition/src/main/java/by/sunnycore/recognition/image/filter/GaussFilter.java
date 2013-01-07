@@ -1,11 +1,10 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.filter;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 
 import by.bsu.nummethods.IFunctionXY;
 import by.bsu.nummethods.gauss.GaussFunction;
-import by.sunnycore.recognition.image.IImageFilter;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class GaussFilter implements IImageFilter{

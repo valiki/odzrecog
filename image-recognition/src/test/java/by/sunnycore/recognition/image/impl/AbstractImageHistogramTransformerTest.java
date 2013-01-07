@@ -3,6 +3,7 @@ package by.sunnycore.recognition.image.impl;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import by.sunnycore.recognition.image.histogram.JAIHistogramBuilder;
 import by.sunnycore.recognition.test.TestUtil;
 
 public abstract class AbstractImageHistogramTransformerTest {

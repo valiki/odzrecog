@@ -5,7 +5,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.IImageFilter;
+import by.sunnycore.recognition.image.filter.GaussFilter;
+import by.sunnycore.recognition.image.filter.IImageFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class GaussFIlterTest {

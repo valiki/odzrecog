@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.splitter;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import by.sunnycore.recognition.domain.Channel;
 import by.sunnycore.recognition.domain.ImageChannel;
-import by.sunnycore.recognition.image.IChannelImageSplitter;
 import by.sunnycore.recognition.image.util.ImageUtil;
 /**
  * splits an RGB image into 3 images where each of them is in only one RGB color component

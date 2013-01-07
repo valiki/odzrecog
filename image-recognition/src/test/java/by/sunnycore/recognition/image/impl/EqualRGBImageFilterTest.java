@@ -8,7 +8,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.IRawImageFilter;
+import by.sunnycore.recognition.image.filter.EqualRGBImageFilter;
+import by.sunnycore.recognition.image.filter.IRawImageFilter;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class EqualRGBImageFilterTest {

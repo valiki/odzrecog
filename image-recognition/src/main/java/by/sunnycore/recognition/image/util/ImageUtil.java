@@ -1,5 +1,8 @@
 package by.sunnycore.recognition.image.util;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
@@ -8,8 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
+
+import by.sunnycore.recognition.test.TestUtil;
 
 /**
  * an utility class for image processing
@@ -21,7 +28,7 @@ public class ImageUtil {
 	
 	private static Logger logger = Logger.getLogger(ImageUtil.class);
 	/**
-	 * return the red component of the pixel of the image
+	 * return the red component of the pixel of the image  in java representation than can be summed up with other components to get the summed RGB valued
 	 * 
 	 * @param pixel
 	 *            the pixel number
@@ -33,7 +40,7 @@ public class ImageUtil {
 	}
 
 	/**
-	 * return the green component of the pixel of the image
+	 * return the green component of the pixel of the image in java representation than can be summed up with other components to get the summed RGB valued
 	 * 
 	 * @param pixel
 	 *            the pixel number
@@ -45,7 +52,7 @@ public class ImageUtil {
 	}
 
 	/**
-	 * return the blue component of the pixel of the image
+	 * return the blue component of the pixel of the image  in java representation than can be summed up with other components to get the summed RGB valued
 	 * 
 	 * @param pixel
 	 *            the pixel number
@@ -53,6 +60,42 @@ public class ImageUtil {
 	 * @return
 	 */
 	public static int getBlue(final int pixel, final ColorModel colorModel) {
+		return colorModel.getBlue(pixel);
+	}
+	
+	/**
+	 * return the red component of the pixel of the image
+	 * 
+	 * @param pixel
+	 *            the pixel number
+	 * @param colorModel
+	 * @return
+	 */
+	public static int getRedRaw(final int pixel, final ColorModel colorModel) {
+		return colorModel.getRed(pixel);
+	}
+
+	/**
+	 * return the green component of the pixel of the image
+	 * 
+	 * @param pixel
+	 *            the pixel number
+	 * @param colorModel
+	 * @return
+	 */
+	public static int getGreenRaw(final int pixel, final ColorModel colorModel) {
+		return colorModel.getGreen(pixel);
+	}
+
+	/**
+	 * return the blue component of the pixel of the image
+	 * 
+	 * @param pixel
+	 *            the pixel number
+	 * @param colorModel
+	 * @return
+	 */
+	public static int getBlueRaw(final int pixel, final ColorModel colorModel) {
 		return colorModel.getBlue(pixel);
 	}
 
@@ -253,5 +296,23 @@ public class ImageUtil {
 			logger.error(e.getMessage(),e);
 			throw e;
 		}
+	}
+	
+	public static BufferedImage createImageFromPanel(JPanel panel,int w,int h){
+		JFrame f = new JFrame();
+		f.setSize(480, 640);
+		f.setContentPane(panel);
+		f.setVisible(true);
+	    BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D g = bi.createGraphics();
+	    //g.dispose();
+	    panel.paint(g);
+	    g.dispose();
+		try {
+			TestUtil.saveImageWithNewName(bi, "\\.png", "_chart.png");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    return bi;
 	}
 }

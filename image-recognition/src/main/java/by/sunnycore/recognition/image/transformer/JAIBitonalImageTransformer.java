@@ -1,8 +1,7 @@
-package by.sunnycore.recognition.image.impl;
+package by.sunnycore.recognition.image.transformer;
 
 import java.awt.image.BufferedImage;
 
-import by.sunnycore.recognition.image.IImageTransformer;
 
 public class JAIBitonalImageTransformer implements IImageTransformer{
 
