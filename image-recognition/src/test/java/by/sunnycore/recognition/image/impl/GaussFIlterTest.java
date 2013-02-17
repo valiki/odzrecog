@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.filter.GaussFilter;
-import by.sunnycore.recognition.image.filter.IImageFilter;
+import by.sunnycore.recognition.image.filter.ImageFilter;
+import by.sunnycore.recognition.image.filter.impl.GaussFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class GaussFIlterTest {
@@ -14,7 +14,7 @@ public class GaussFIlterTest {
 	@Test
 	public void test() throws IOException{
 		BufferedImage src = TestUtil.loadImage();
-		IImageFilter filter = new GaussFilter();
+		ImageFilter filter = new GaussFilter();
 		BufferedImage result = filter.filter(src);
 		String name = "_gauss_filter";
 		TestUtil.saveImageWithNewName(result, "\\.bmp", name+".png");

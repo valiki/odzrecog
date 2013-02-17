@@ -7,15 +7,15 @@ import javax.media.jai.operator.MedianFilterDescriptor;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.filter.IImageFilter;
-import by.sunnycore.recognition.image.filter.JAIMedianFilter;
+import by.sunnycore.recognition.image.filter.ImageFilter;
+import by.sunnycore.recognition.image.filter.impl.JAIMedianFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class MedianFilterTest {
 	@Test
 	public void test() throws IOException{
 		BufferedImage source = TestUtil.loadImage();
-		IImageFilter filter = new JAIMedianFilter(10,MedianFilterDescriptor.MEDIAN_MASK_X);
+		ImageFilter filter = new JAIMedianFilter(10,MedianFilterDescriptor.MEDIAN_MASK_X);
 		BufferedImage result = filter.filter(source);
 		String name = "_median";
 		TestUtil.saveImageWithNewName(result, "\\.bmp", name+".png");

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.transformer.JAIHistogramEqualizationTransformer;
+import by.sunnycore.recognition.image.transformer.impl.JAIHistogramEqualizationTransformer;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class JAIHistogramEqualizationTransformerTest extends AbstractImageHistogramTransformerTest{

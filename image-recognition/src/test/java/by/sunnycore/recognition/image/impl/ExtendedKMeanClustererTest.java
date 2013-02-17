@@ -15,11 +15,13 @@ import java.util.Map;
 import org.math.plot.Plot3DPanel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
-import by.sunnycore.recognition.image.cluster.ExtendedKMeansClusterer;
+import by.sunnycore.recognition.image.cluster.impl.ExtendedKMeansClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class ExtendedKMeanClustererTest {
+
+	private static final String SERIALIZED_CLUSTERS_FILE = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/src/main/resources/clusters.ser";
 
 	public static void main(String[] args) {
 		try {
@@ -44,7 +46,7 @@ public class ExtendedKMeanClustererTest {
 		final DirectColorModel colorModel = (DirectColorModel) pixelGrabber.getColorModel();
 		BufferedImage newImg = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
 		TestUtil.saveImageWithNewName(newImg, "\\.png", "_test.png");
-		//clusterImageIntoFile(source);
+		clusterImageIntoFile(source);
 		ObjectCluster[] clusters = loadCLustersFromFile();
 		Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
 		for(int i=0;i<clusters.length;i++){
@@ -103,7 +105,7 @@ public class ExtendedKMeanClustererTest {
 	
 	private ObjectCluster[] loadCLustersFromFile(){
 		ObjectCluster[] clusters = null;
-		try(FileInputStream fileInputStream = new FileInputStream("D:\\clusters.ser");
+		try(FileInputStream fileInputStream = new FileInputStream(SERIALIZED_CLUSTERS_FILE);
 			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream)){
 			Object one = oInputStream.readObject();
 			clusters = (ObjectCluster[]) one;
@@ -117,7 +119,7 @@ public class ExtendedKMeanClustererTest {
 			FileNotFoundException {
 		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
 		ObjectCluster[] clusters = clusterer.cluster(source);
-		try (FileOutputStream fileStream = new FileOutputStream("D:\\clusters.ser");
+		try (FileOutputStream fileStream = new FileOutputStream(SERIALIZED_CLUSTERS_FILE);
 			 ObjectOutputStream os = new ObjectOutputStream(fileStream);) {
 			os.writeObject(clusters);
 		}

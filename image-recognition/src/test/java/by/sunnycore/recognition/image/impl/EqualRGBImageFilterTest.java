@@ -8,8 +8,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.filter.EqualRGBImageFilter;
-import by.sunnycore.recognition.image.filter.IRawImageFilter;
+import by.sunnycore.recognition.image.filter.RawImageFilter;
+import by.sunnycore.recognition.image.filter.impl.EqualRGBImageFilter;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class EqualRGBImageFilterTest {
@@ -24,7 +24,7 @@ public class EqualRGBImageFilterTest {
 				return pathname.isDirectory();
 			}
 		});
-		final IRawImageFilter imageFilter = new EqualRGBImageFilter();
+		final RawImageFilter imageFilter = new EqualRGBImageFilter();
 		int counter = 0;
 		for(File child:children){
 			File[] images = child.listFiles(new FilenameFilter() {

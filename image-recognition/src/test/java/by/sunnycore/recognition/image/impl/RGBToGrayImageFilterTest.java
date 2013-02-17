@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.image.filter.IImageFilter;
-import by.sunnycore.recognition.image.filter.RGBToGrayImageFilter;
+import by.sunnycore.recognition.image.filter.ImageFilter;
+import by.sunnycore.recognition.image.filter.impl.RGBToGrayImageFilter;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class RGBToGrayImageFilterTest {
@@ -14,7 +14,7 @@ public class RGBToGrayImageFilterTest {
 	@Test
 	public void test() throws IOException{
 		BufferedImage image = TestUtil.loadImage("images/0020_median.png");
-		IImageFilter filter = new RGBToGrayImageFilter();
+		ImageFilter filter = new RGBToGrayImageFilter();
 		BufferedImage res = filter.filter(image);
 		TestUtil.saveImageWithNewName(res, "\\.bmp", "_gray"+".png");
 	}
