@@ -7,6 +7,28 @@
 	<version>1.0.1-SNAPSHOT</version>
 	<name>numerical-methods</name>
 	<url>http://bsu.by</url>
+	<repositories>
+		<repository>
+			<id>repository.jboss.org</id>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>repository.central</id>
+			<url>http://repo1.maven.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -22,7 +44,7 @@
 	</dependencies>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
-  		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

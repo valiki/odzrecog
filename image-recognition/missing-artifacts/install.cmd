@@ -1,0 +1,2 @@
+start mvn install:install-file -Dfile=javaml-0.1.7.jar -Dpackaging=jar -DgroupId=javaml -DartifactId=javaml -Dversion=0.1.7 -Dsource=javaml-0.1.7-src.zip
+start mvn install:install-file -Dfile=jmathplot.jar -Dpackaging=jar -DgroupId=jmathTools -DartifactId=jmathPlot -Dversion=1.0

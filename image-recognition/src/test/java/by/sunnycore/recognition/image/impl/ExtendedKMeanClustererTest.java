@@ -1,7 +1,5 @@
 package by.sunnycore.recognition.image.impl;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.DirectColorModel;
 import java.awt.image.PixelGrabber;
