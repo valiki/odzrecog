@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
 import org.math.plot.Plot3DPanel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;

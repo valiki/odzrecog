@@ -5,13 +5,14 @@ import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.lang.reflect.Field;
 
+import net.sf.javaml.clustering.KMeans;
+import net.sf.javaml.core.Instance;
+
 import org.apache.log4j.Logger;
 
-import net.sf.javaml.clustering.KMeans;
-import net.sf.javaml.core.Dataset;
-import net.sf.javaml.core.Instance;
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.ImageClusterer;
+import by.sunnycore.recognition.image.cluster.KMeansDataClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.image.util.JavaMlUtil;
 
@@ -76,22 +77,26 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	 */
 	private ObjectCluster[] doKMeansIteration(int[][] pointsRGB, int clusterNumber) {
 		try {
-			KMeans clusterer = new KMeans(clusterNumber);
+			KMeansDataClusterer clusterer = new KMeansDataClusterer(clusterNumber);
+			//KMeans clusterer = new KMeans(clusterNumber);
 			logger.info(" creating dataset from array of pixels");
-			Dataset clusterDataSet = JavaMlUtil.arrayToDataSet(pointsRGB);
+			//Dataset clusterDataSet = JavaMlUtil.arrayToDataSet(pointsRGB);
 			logger.info("clustering using clusterer");
-			Dataset[] clusters = clusterer.cluster(clusterDataSet);
+			//Dataset[] clusters = clusterer.cluster(clusterDataSet);
+			double[][] data = intToDouble(pointsRGB);
+			double[][][] res = clusterer.cluster(data);
 			ObjectCluster[] result = new ObjectCluster[clusterNumber];
 			//the coordinates of the cluster centers
 			Field centrodsField = KMeans.class.getDeclaredField("centroids");
 			centrodsField.setAccessible(true);
 			Instance[] centroids = (Instance[]) centrodsField.get(clusterer);
 			logger.info("dataset to object clusters");
-			for(int i=0;i<result.length;i++){
+			for(int i=0;i<res.length;i++){
 				ObjectCluster objCluster = new ObjectCluster();
 				result[i]=objCluster;
-				Dataset cluster = clusters[i];
-				int[][] clusterPoints = JavaMlUtil.dataSetToArray(cluster);
+				//Dataset cluster = clusters[i];
+				//int[][] clusterPoints = JavaMlUtil.dataSetToArray(cluster);
+				int[][] clusterPoints = doubleToInt(res[i]);
 				objCluster.setClusterPoints(clusterPoints);
 				Instance center = centroids[i];
 				int[] centerInt = JavaMlUtil.instanceToArray(center);
@@ -102,6 +107,26 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 			logger.error(e.getMessage(),e);
 		}
 		return null;
+	}
+
+	private double[][] intToDouble(int[][] pointsRGB) {
+		double[][] data = new double[pointsRGB[0].length][pointsRGB.length];
+		for(int i=0;i<pointsRGB.length;i++){
+			for(int j=0;j<pointsRGB[0].length;j++){
+				data[j][i] = pointsRGB[i][j];
+			}
+		}
+		return data;
+	}
+	
+	private int[][] doubleToInt(double[][] data){
+		int[][] data1 = new int[data.length][data[0].length];
+		for(int i=0;i<data.length;i++){
+			for(int j=0;j<data[0].length;j++){
+				data1[i][j] = (int) data[i][j];
+			}
+		}
+		return data1;
 	}
 
 	/**
