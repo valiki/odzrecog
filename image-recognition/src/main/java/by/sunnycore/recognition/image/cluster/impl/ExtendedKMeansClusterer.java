@@ -3,10 +3,6 @@ package by.sunnycore.recognition.image.cluster.impl;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
-import java.lang.reflect.Field;
-
-import net.sf.javaml.clustering.KMeans;
-import net.sf.javaml.core.Instance;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +10,6 @@ import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.ImageClusterer;
 import by.sunnycore.recognition.image.cluster.KMeansDataClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
-import by.sunnycore.recognition.image.util.JavaMlUtil;
 
 /**
  * 
@@ -83,23 +78,24 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 			//Dataset clusterDataSet = JavaMlUtil.arrayToDataSet(pointsRGB);
 			logger.info("clustering using clusterer");
 			//Dataset[] clusters = clusterer.cluster(clusterDataSet);
-			double[][] data = intToDouble(pointsRGB);
-			double[][][] res = clusterer.cluster(data);
+			short[][] data = intToShort(pointsRGB);
+			short[][][] res = clusterer.cluster(data);
 			ObjectCluster[] result = new ObjectCluster[clusterNumber];
 			//the coordinates of the cluster centers
-			Field centrodsField = KMeans.class.getDeclaredField("centroids");
+/*			Field centrodsField = KMeans.class.getDeclaredField("centroids");
 			centrodsField.setAccessible(true);
-			Instance[] centroids = (Instance[]) centrodsField.get(clusterer);
+			Instance[] centroids = (Instance[]) centrodsField.get(clusterer);*/
 			logger.info("dataset to object clusters");
+			short[][] clusterCenters = clusterer.getClusterCenters();
 			for(int i=0;i<res.length;i++){
 				ObjectCluster objCluster = new ObjectCluster();
 				result[i]=objCluster;
 				//Dataset cluster = clusters[i];
 				//int[][] clusterPoints = JavaMlUtil.dataSetToArray(cluster);
-				int[][] clusterPoints = doubleToInt(res[i]);
+				int[][] clusterPoints = shortToInt(res[i]);
 				objCluster.setClusterPoints(clusterPoints);
-				Instance center = centroids[i];
-				int[] centerInt = JavaMlUtil.instanceToArray(center);
+/*				Instance center = centroids[i];*/
+				int[] centerInt = shortToInt(clusterCenters[i]);
 				objCluster.setClusterCenter(centerInt);
 			}
 			return result;
@@ -109,22 +105,28 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 		return null;
 	}
 
-	private double[][] intToDouble(int[][] pointsRGB) {
-		double[][] data = new double[pointsRGB[0].length][pointsRGB.length];
+	private short[][] intToShort(int[][] pointsRGB) {
+		short[][] data = new short[pointsRGB.length][pointsRGB[0].length];
 		for(int i=0;i<pointsRGB.length;i++){
 			for(int j=0;j<pointsRGB[0].length;j++){
-				data[j][i] = pointsRGB[i][j];
+				data[i][j] = (short) pointsRGB[i][j];
 			}
 		}
 		return data;
 	}
 	
-	private int[][] doubleToInt(double[][] data){
+	private int[][] shortToInt(short[][] data){
 		int[][] data1 = new int[data.length][data[0].length];
 		for(int i=0;i<data.length;i++){
-			for(int j=0;j<data[0].length;j++){
-				data1[i][j] = (int) data[i][j];
-			}
+			data1[i] = shortToInt(data[i]);
+		}
+		return data1;
+	}
+	
+	private int[] shortToInt(short[] data){
+		int[] data1 = new int[data.length];
+		for(int i=0;i<data.length;i++){
+			data1[i] = (int) data[i];
 		}
 		return data1;
 	}
@@ -176,7 +178,7 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 			int[] clusterCenter = cluster.getClusterCenter();
 			for(int k=0;k<clusterPixels.length;k++){
 				long normValue = 0;
-				int[] dot = clusterPixels[k];
+				int[] dot = extractDot(clusterPixels, k);
 				for(int i=0;i<clusterCenter.length;i++){
 					normValue+=(Math.pow(dot[i]-clusterCenter[i], 2));
 				}
@@ -187,6 +189,13 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 		return result;
 	}
 
+	private int[] extractDot(int[][] clusterPixels,int dotIndex){
+		int[] dot = new int[clusterPixels.length];
+		for(int j=0;j<clusterPixels.length;j++){
+			dot[j]=clusterPixels[j][dotIndex];
+		}
+		return dot;
+	}
 	/**
 	 * counts the validity of the current clusterization
 	 * 

@@ -18,5 +18,5 @@ public interface DataClusterer {
 	 *         2nd index is dimensions index and third index is point number
 	 *         index
 	 */
-	public double[][][] cluster(double[][] data);
+	public short[][][] cluster(short[][] data);
 }

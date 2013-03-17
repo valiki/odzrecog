@@ -10,11 +10,20 @@ import by.sunnycore.recognition.image.cluster.impl.EuklidDistanceCounter;
  */
 public class KMeansDataClusterer implements DataClusterer{
 
+	private static final short EMPTY_DOT_MARKER = Short.MIN_VALUE;
 	private int clustersNumber;
-	private double[][] clusterCenters;
-	private double coordMinValue;
-	private double coordMaxValue;
+	private short[][] clusterCenters;
+	public short[][] getClusterCenters() {
+		return clusterCenters;
+	}
+
+	private short coordMinValue;
+	private short coordMaxValue;
 	
+	private short[][][] result;
+	private short[][][] dataToUse;
+	private int[] pointsInClusters;
+	private int currentPointsIncluster;
 	/**
 	 * Object that counts distance between two dots
 	 */
@@ -25,14 +34,14 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param clustersNumber
 	 */
 	public KMeansDataClusterer(int clustersNumber) {
-		this(clustersNumber,null,0,0);
+		this(clustersNumber,null,(short)0,(short)0);
 	}
 	
 	/**
 	 * 
 	 * @param clustersNumber
 	 */
-	public KMeansDataClusterer(int clustersNumber,double coordMinValue,double coordMaxValue) {
+	public KMeansDataClusterer(int clustersNumber,short coordMinValue,short coordMaxValue) {
 		this(clustersNumber,null,coordMinValue,coordMaxValue);
 	}
 	
@@ -41,7 +50,7 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param clustersNumber
 	 * @param clustersCenters
 	 */
-	public KMeansDataClusterer(int clustersNumber,double[][] clustersCenters,double coordMinValue,double coordMaxValue){
+	public KMeansDataClusterer(int clustersNumber,short[][] clustersCenters,short coordMinValue,short coordMaxValue){
 		this.clustersNumber = clustersNumber;
 		this.clusterCenters = clustersCenters;
 		this.coordMinValue = coordMinValue;
@@ -49,12 +58,20 @@ public class KMeansDataClusterer implements DataClusterer{
 	}
 	
 	@Override
-	public double[][][] cluster(double[][] data) {
+	public short[][][] cluster(short[][] data) {
+		long time = System.currentTimeMillis();
+		pointsInClusters = new int[clustersNumber];
 		checkClusterCenters(data);
-		double[][][] result = null;
+		int iterationNumber = 0;
+		result = new short[clustersNumber][data.length][data[0].length];
+		assignDotsToClusters(data);
+		dataToUse = new short[clustersNumber][data.length][data[0].length];
+		copyData(result, dataToUse);
+		clusterCenters = recalculateClusterCenters(dataToUse);
 		while(true){
-			result = assignDotsToClusters(data);
-			double[][] newCenters = recalculateClusterCenters(result);
+			iterationNumber++;
+			assignDotsToClusters(dataToUse);
+			short[][] newCenters = recalculateClusterCenters(result);
 			double maxDistance = -1;
 			for(int i=0;i<newCenters.length;i++){
 				double distance = distanceCounter.countDistance(newCenters[i], clusterCenters[i]);
@@ -63,11 +80,41 @@ public class KMeansDataClusterer implements DataClusterer{
 				}
 			}
 			clusterCenters = newCenters;
+			copyData(result, dataToUse);
+			System.out.println("Done iteration number "+iterationNumber+", centers changed max by "+maxDistance);
 			if(maxDistance<0.5){
 				break;
 			}
 		}
-		return null;
+		short[][][] returnResult = truncateArray(dataToUse);
+		System.out.println("Clustering execution time: "+(System.currentTimeMillis()-time)+"millis");
+		return returnResult;
+	}
+	
+	private short[][][] truncateArray(short[][][] data){
+		short[][][] result = new short[clustersNumber][data[0].length][1];
+		//later 1 will be replaced with number of points in cluster
+		for(int i=0;i<data.length;i++){
+			for(int j=0;j<data[i].length;j++){
+				result[i][j] = new short[pointsInClusters[i]];
+				int k=0;
+				for(int n=0;n<data[i][j].length;n++){
+					if(data[i][j][n] != EMPTY_DOT_MARKER){
+						result[i][j][k]=data[i][j][n];
+						k++;
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	private void copyData(short[][][] from,short[][][] to){
+		for(int i=0;i<from.length;i++){
+			for(int j=0;j<from[i].length;j++){
+				System.arraycopy(from[i][j], 0, to[i][j], 0, from[i][j].length);
+			}
+		}
 	}
 	
 	/**
@@ -77,51 +124,97 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param clusterCenters
 	 * @return
 	 */
-	public double[][][] assignDotsToClusters(double[][] data){
-		double[][][] result = new double[clustersNumber][data.length][data[0].length];
-		for(int i=0;i<data.length;i++){
-			int cluster = calculateDotCluster(data[i]);
-			result[cluster][i]=data[i];
+	public void assignDotsToClusters(short[][] data){
+		nullOutArray(result);
+		for(int i=0;i<data[0].length;i++){
+			short[] dot = new short[data.length];
+			for(int j=0;j<data.length;j++){
+				dot[j]=data[j][i];
+			}
+			int cluster = calculateDotCluster(dot);
+			for(int j=0;j<dot.length;j++){
+				result[cluster][j][i]=dot[j];
+			}
 		}
-		//result will have a lot of empty array point slots
-		//we need to remove empty points from it
-		double[][][] newResult = new double[clustersNumber][data.length][data[0].length];
-		int k = 0;
-		for(int i=0;i<result.length;i++){
-			for(int j=0;j<result[i].length;j++){
-				if(result[i][j]!=null){
-					newResult[i][k]=result[i][j];
-					k++;
+	}
+	
+	private void nullOutArray(short[][][] array){
+		for(int i=0;i<array.length;i++){
+			for(int j=0;j<array[i].length;j++){
+				for(int k=0;k<array[i][j].length;k++){
+					array[i][j][k]=EMPTY_DOT_MARKER;
 				}
 			}
 		}
-		return newResult;
 	}
-	public double[][] recalculateClusterCenters(double[][][] clusters){
-		double[][] newClusterCenters = new double[clusterCenters.length][clusterCenters[0].length];
+	
+	/**
+	 * assigns dots to the clusters depending on the cluster centers and data dots
+	 * 
+	 * @param data
+	 * @param clusterCenters
+	 * @return
+	 */
+	public void assignDotsToClusters(short[][][] data){
+		nullOutArray(result);
+		int notEmptyDots = 0;
+		for(int i=0;i<data.length;i++){
+			for (int j = 0; j < data[i][0].length; j++) {
+				if (data[i][0][j] == EMPTY_DOT_MARKER) {
+					continue;
+				}else{
+					notEmptyDots++;
+				}
+				short[] dot = new short[data[i].length];
+				for (int k = 0; k < data[i].length; k++) {
+					dot[k] = data[i][k][j];
+				}
+				int cluster = calculateDotCluster(dot);
+				for (int k = 0; k < dot.length; k++) {
+					result[cluster][k][j] = dot[k];
+				}
+			}
+		}
+		System.out.println("number of not empty dots "+notEmptyDots);
+	}
+	
+	public short[][] recalculateClusterCenters(short[][][] clusters){
+		short[][] newClusterCenters = new short[clusterCenters.length][clusterCenters[0].length];
 		for(int i=0;i<clusters.length;i++){
 			//calculate new cluster center
-			double[] center = calculateClusterCenter(clusters[i]);
+			short[] center = calculateClusterCenter(clusters[i]);
+			pointsInClusters[i]=currentPointsIncluster;
 			newClusterCenters[i]=center;
 		}
 		return newClusterCenters;
 	}
 	
-	public double[] calculateClusterCenter(double[][] clusterPoints){
-		double[] clusterCenter = new double[clusterPoints[0].length];
+	public short[] calculateClusterCenter(short[][] clusterPoints){
+		int[] clusterCenter = new int[clusterPoints.length];
 		//init cluster center dimensions with 0 values
 		for(int i=0;i<clusterCenter.length;i++){
 			clusterCenter[i]=0;
 		}
-		for(int i=0;i<clusterPoints.length;i++){
-			for(int j=0;j<clusterPoints[i].length;j++){
-				clusterCenter[j]+=clusterPoints[i][j];
+		int pointsNumber = 0;
+		for(int i=0;i<clusterPoints[0].length;i++){
+			//if current dot was not initialized in array
+			if(clusterPoints[0][i]==EMPTY_DOT_MARKER){
+				continue;
+			}
+			pointsNumber++;
+			for(int j=0;j<clusterPoints.length;j++){
+				clusterCenter[j]+=clusterPoints[j][i];
 			}
 		}
-		for(int i=0;i<clusterCenter.length;i++){
-			clusterCenter[i]/=clusterPoints.length;
+		short[] center = new short[clusterCenter.length];
+		if (pointsNumber>0) {
+			for (int i = 0; i < clusterCenter.length; i++) {
+				int value = clusterCenter[i] / pointsNumber;
+				center[i] = (short)value;
+			}
 		}
-		return clusterCenter;
+		currentPointsIncluster = pointsNumber;
+		return center;
 	}
 	/**
 	 * calculates to which cluster current dot corresponds
@@ -129,7 +222,7 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param dot
 	 * @return the number of the cluster starting from 0
 	 */
-	public int calculateDotCluster(double[] dot){
+	public int calculateDotCluster(short[] dot){
 		double minimalDist = Double.MAX_VALUE;
 		int cluster = Integer.MAX_VALUE;
 		for(int i=0;i<clusterCenters.length;i++){
@@ -143,27 +236,17 @@ public class KMeansDataClusterer implements DataClusterer{
 	}
 	
 	/**
-	 * counts new cluster centers as the average coordinates of all dots in the cluster
-	 * 
-	 * @param clusteredDots
-	 * @return
-	 */
-	public double[][] countNewClusterCenters(double[][][] clusteredDots){
-		return null;
-	}
-	
-	/**
 	 * checks whether the centers of the clusters are populated. if not generates them.
 	 * 
 	 * @param data
 	 */
-	private void checkClusterCenters(double[][] data) {
+	private void checkClusterCenters(short[][] data) {
 		checkCoordinatesMinMaxValue(data);
 		if(clusterCenters==null){
 			//define clusters centers as random values
 			//the number of dimensions in point coordinates
-			int dimensionsNumber = data[0].length;
-			clusterCenters = new double[clustersNumber][dimensionsNumber];
+			int dimensionsNumber = data.length;
+			clusterCenters = new short[clustersNumber][dimensionsNumber];
 			for(int i=0;i<clusterCenters.length;i++){
 				for(int j=0;j<clusterCenters[i].length;j++){
 					clusterCenters[i][j]=generateRandomCoordinate(coordMinValue,coordMaxValue);
@@ -172,10 +255,10 @@ public class KMeansDataClusterer implements DataClusterer{
 		}
 	}
 
-	private void checkCoordinatesMinMaxValue(double[][] data) {
+	private void checkCoordinatesMinMaxValue(short[][] data) {
 		if(coordMinValue==coordMaxValue){
-			double minValue = Double.MAX_VALUE;
-			double maxValue = Double.MIN_VALUE;
+			short minValue = Short.MAX_VALUE;
+			short maxValue = EMPTY_DOT_MARKER;
 			for(int i=0;i<data.length;i++){
 				for(int j=0;j<data[i].length;j++){
 					if(data[i][j]<minValue){
@@ -197,9 +280,9 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param max maximaum random value
 	 * @return random number between min and max
 	 */
-	public double generateRandomCoordinate(double min,double max) {
-		double randomGap = Math.random()*(max-min);
-		return min+randomGap;
+	public short generateRandomCoordinate(short min,short max) {
+		short randomGap = (short) (Math.random()*(max-min));
+		return (short) (min+randomGap);
 	}
 
 }
