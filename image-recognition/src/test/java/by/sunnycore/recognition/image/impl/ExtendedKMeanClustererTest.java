@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import org.math.plot.Plot3DPanel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
@@ -84,17 +86,17 @@ public class ExtendedKMeanClustererTest {
 		for(int k=0;k<clusters.length;k++){
 			ObjectCluster cluster = clusters[k];
 			int[][] points = cluster.getClusterPoints();
-			int l = points.length/10;
+			int l = points[0].length/10;
 			l = (l<5000)?l:5000;
 			double[][] datasetPoints = new double[3][l];
 			for(int i=0;i<l;i++){
-				datasetPoints[0][i]=points[i][0];
-				datasetPoints[1][i]=points[i][1];
-				datasetPoints[2][i]=points[i][2];
+				datasetPoints[0][i]=points[0][i];
+				datasetPoints[1][i]=points[1][i];
+				datasetPoints[2][i]=points[2][i];
 			}
 			chart.addScatterPlot("Cluster "+k, datasetPoints[0],datasetPoints[1],datasetPoints[2]);
 		}
-/*		JFrame frame = new JFrame("a plot panel");
+		/*JFrame frame = new JFrame("a plot panel");
 		frame.setBounds(0, 0, 480, 640);
 		frame.setContentPane(chart);
 		frame.setVisible(true);*/

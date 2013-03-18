@@ -1,5 +1,11 @@
 package by.sunnycore.recognition.image.cluster;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.log4j.Logger;
+
 import by.sunnycore.recognition.image.cluster.impl.EuklidDistanceCounter;
 
 /**
@@ -10,9 +16,16 @@ import by.sunnycore.recognition.image.cluster.impl.EuklidDistanceCounter;
  */
 public class KMeansDataClusterer implements DataClusterer{
 
+	private static final int THREADS_NUMBER = 60;
+
+	private Logger logger = Logger.getLogger(KMeansDataClusterer.class);
+	private List<Thread> executors = new ArrayList<>();
+	private Runnable[] jobs;
 	private static final short EMPTY_DOT_MARKER = Short.MIN_VALUE;
 	private int clustersNumber;
 	private short[][] clusterCenters;
+	private boolean running = true;
+	
 	public short[][] getClusterCenters() {
 		return clusterCenters;
 	}
@@ -24,6 +37,7 @@ public class KMeansDataClusterer implements DataClusterer{
 	private short[][][] dataToUse;
 	private int[] pointsInClusters;
 	private int currentPointsIncluster;
+	private AtomicInteger completedThreadsCount = new AtomicInteger(0);
 	/**
 	 * Object that counts distance between two dots
 	 */
@@ -59,6 +73,7 @@ public class KMeansDataClusterer implements DataClusterer{
 	
 	@Override
 	public short[][][] cluster(short[][] data) {
+		initExecutors();
 		long time = System.currentTimeMillis();
 		pointsInClusters = new int[clustersNumber];
 		checkClusterCenters(data);
@@ -68,7 +83,9 @@ public class KMeansDataClusterer implements DataClusterer{
 		dataToUse = new short[clustersNumber][data.length][data[0].length];
 		copyData(result, dataToUse);
 		clusterCenters = recalculateClusterCenters(dataToUse);
+		
 		while(true){
+			long millis = System.currentTimeMillis();
 			iterationNumber++;
 			assignDotsToClusters(dataToUse);
 			short[][] newCenters = recalculateClusterCenters(result);
@@ -85,10 +102,49 @@ public class KMeansDataClusterer implements DataClusterer{
 			if(maxDistance<0.5){
 				break;
 			}
+			System.out.println("one iteration is done in "+(System.currentTimeMillis()-millis));
 		}
 		short[][][] returnResult = truncateArray(dataToUse);
 		System.out.println("Clustering execution time: "+(System.currentTimeMillis()-time)+"millis");
 		return returnResult;
+	}
+	
+	private void initExecutors(){
+		executors = new ArrayList<>();
+		jobs = new Runnable[THREADS_NUMBER];
+		for(int i=0;i<THREADS_NUMBER;i++){
+			jobs[i]=new Runnable() {
+				
+				@Override
+				public void run() {
+					//this is stub job
+				}
+			};
+			final int jobIndex = i;
+			final Thread th = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					while(running){
+						jobs[jobIndex].run();
+						completedThreadsCount.incrementAndGet();
+						synchronized (Thread.currentThread()) {
+							try {
+								Thread.currentThread().wait();
+							} catch (InterruptedException e) {
+								logger.info("Thread was interrupted",e);
+							}
+						}
+						
+					}
+				}
+			});
+			executors.add(th);
+		}
+		for(Thread th:executors){
+			th.start();
+		}
+		
 	}
 	
 	private short[][][] truncateArray(short[][][] data){
@@ -124,15 +180,48 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param clusterCenters
 	 * @return
 	 */
-	public void assignDotsToClusters(short[][] data){
+	public void assignDotsToClusters(final short[][] data){
 		nullOutArray(result);
-		for(int i=0;i<data[0].length;i++){
-			short[] dot = new short[data.length];
-			for(int j=0;j<data.length;j++){
+		final int threadsNumber = 8;
+		int lastEnd = 0;
+		for(int i=0;i<threadsNumber;i++){
+			final int currentStart;
+			final int currentEnd;
+			if (i<threadsNumber-1) {
+				currentStart = data[0].length / threadsNumber * i;
+				currentEnd = data[0].length / threadsNumber * i + 1;
+			}else{
+				currentStart = lastEnd;
+				currentEnd = data[0].length;
+			}
+			lastEnd = currentEnd;
+			addJobToExecutor(data, currentStart, currentEnd,i);
+		}
+		executeExecutors();
+	}
+
+	private void addJobToExecutor(final short[][] data, final int currentStart,
+			final int currentEnd,int index) {
+			jobs[index]=new Runnable() {
+				
+				private int start = currentStart;
+				private int end = currentEnd;
+				
+				@Override
+				public void run() {
+					assignDotsGapToClusters(data,start,end);
+				}
+			};
+	}
+	
+	private void assignDotsGapToClusters(final short[][] data,int start,int end) {
+		for(int i=start;i<end;i++){
+			short[] dot = new short[data.length];//3
+			for(int j=0;j<data.length;j++){//3
 				dot[j]=data[j][i];
 			}
 			int cluster = calculateDotCluster(dot);
-			for(int j=0;j<dot.length;j++){
+			for(int j=0;j<dot.length;j++){//3
 				result[cluster][j][i]=dot[j];
 			}
 		}
@@ -155,15 +244,63 @@ public class KMeansDataClusterer implements DataClusterer{
 	 * @param clusterCenters
 	 * @return
 	 */
-	public void assignDotsToClusters(short[][][] data){
+	public void assignDotsToClusters(final short[][][] data){
 		nullOutArray(result);
-		int notEmptyDots = 0;
+		final int threadsNumber = THREADS_NUMBER;
+		int lastEnd = 0;
+		for(int i=0;i<threadsNumber;i++){
+			final int currentStart;
+			final int currentEnd;
+			if (i<threadsNumber-1) {
+				currentStart = data[0][0].length / threadsNumber * i;
+				currentEnd = data[0][0].length / threadsNumber * i + 1;
+			}else{
+				currentStart = lastEnd;
+				currentEnd = data[0][0].length;
+			}
+			lastEnd = currentEnd;
+			addJobToExecutor(data, currentStart, currentEnd,i);
+		}
+		executeExecutors();
+	}
+
+	private void executeExecutors() {
+		completedThreadsCount = new AtomicInteger(0);
+		for(Thread th:executors){
+			synchronized (th) {
+				th.notify();
+			}
+			
+		}
+		while(completedThreadsCount.get()<THREADS_NUMBER){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				logger.info("Thread was interrupted",e);
+			}
+		}
+	}
+
+	private void addJobToExecutor(final short[][][] data,
+			final int currentStart, final int currentEnd,int index) {
+		jobs[index] = new Runnable() {
+			
+			private int start = currentStart;
+			private int end = currentEnd;
+			
+			@Override
+			public void run() {
+				assignDotsGapToClusters(data,start,end);
+			}
+
+		};
+	}
+	
+	private void assignDotsGapToClusters(final short[][][] data,int start,int end) {
 		for(int i=0;i<data.length;i++){
-			for (int j = 0; j < data[i][0].length; j++) {
+			for (int j = start; j < end; j++) {
 				if (data[i][0][j] == EMPTY_DOT_MARKER) {
 					continue;
-				}else{
-					notEmptyDots++;
 				}
 				short[] dot = new short[data[i].length];
 				for (int k = 0; k < data[i].length; k++) {
@@ -175,7 +312,6 @@ public class KMeansDataClusterer implements DataClusterer{
 				}
 			}
 		}
-		System.out.println("number of not empty dots "+notEmptyDots);
 	}
 	
 	public short[][] recalculateClusterCenters(short[][][] clusters){
@@ -285,4 +421,12 @@ public class KMeansDataClusterer implements DataClusterer{
 		return (short) (min+randomGap);
 	}
 
+	public void destroy(){
+		running=false;
+		for(Thread th:executors){
+			th.interrupt();
+		}
+		executors = new ArrayList<>();
+	}
+	
 }

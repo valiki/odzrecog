@@ -3,6 +3,8 @@ package by.sunnycore.recognition.image.cluster.impl;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 import org.apache.log4j.Logger;
 
@@ -51,6 +53,8 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 			logger.info("starting k means clustering iteration with "+i+" number of clusters");
 			ObjectCluster[] clusters = doKMeansIteration(pointsRGB, i);
 			logger.info("done k means clustering with "+i+" number of clusters");
+			//serialize clusters into file so that we wont recount them again
+			serializeClustersIntoFile(clusters, i);
 			//System.out.println("done k means clustering with "+i+" number of clusters");
 			double validity = countValidity(clusters, numberOfPixels);
 			//System.out.println("the validity is"+validity);
@@ -63,6 +67,14 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 		return theBestClusters;
 	}
 
+	private void serializeClustersIntoFile(ObjectCluster[] clusters,int index){
+		try (FileOutputStream fileStream = new FileOutputStream("c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/src/main/resources/clusters-"+index+".ser");
+				 ObjectOutputStream os = new ObjectOutputStream(fileStream);) {
+				os.writeObject(clusters);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
 	/**
 	 * does one itreation of the clusterization 
 	 * that uses the KMeans clusterization and clusterNumber number of clusters
@@ -98,6 +110,7 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 				int[] centerInt = shortToInt(clusterCenters[i]);
 				objCluster.setClusterCenter(centerInt);
 			}
+			clusterer.destroy();
 			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -140,8 +153,8 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	 * @param numOfpoints number of all pixels of the image
 	 * @return
 	 */
-	private long countInterLength(ObjectCluster[] clusters) {
-		long mininalLength = Long.MAX_VALUE;
+	private double countInterLength(ObjectCluster[] clusters) {
+		double mininalLength = Double.MAX_VALUE;
 		for(int i=0;i<clusters.length-1;i++){
 			ObjectCluster iCluster = clusters[i];
 			int[] iClusterCenter = iCluster.getClusterCenter();
@@ -171,12 +184,12 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	 * @param numOfpoints number of all pixels of the image
 	 * @return
 	 */
-	private long countIntraLength(ObjectCluster[] clusters,int numOfpoints) {
-		long result = 0;
+	private double countIntraLength(ObjectCluster[] clusters,int numOfpoints) {
+		double result = 0;
 		for(ObjectCluster cluster:clusters){
 			int[][] clusterPixels = cluster.getClusterPoints();
 			int[] clusterCenter = cluster.getClusterCenter();
-			for(int k=0;k<clusterPixels.length;k++){
+			for(int k=0;k<clusterPixels[0].length;k++){
 				long normValue = 0;
 				int[] dot = extractDot(clusterPixels, k);
 				for(int i=0;i<clusterCenter.length;i++){
@@ -185,7 +198,7 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 				result+=normValue;
 			}
 		}
-		result = result/(long)numOfpoints;
+		result = result/(double)numOfpoints;
 		return result;
 	}
 
@@ -202,7 +215,7 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	 * @return
 	 */
 	private double countValidity(ObjectCluster[] clusters,int numberOfPixels) {
-		return (double)countIntraLength(clusters,numberOfPixels)/(double)countInterLength(clusters);
+		return countIntraLength(clusters,numberOfPixels)/countInterLength(clusters);
 	}
 
 }
