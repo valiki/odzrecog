@@ -11,8 +11,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JFrame;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.math.plot.Plot3DPanel;
 
@@ -23,7 +24,7 @@ import by.sunnycore.recognition.test.TestUtil;
 
 public class ExtendedKMeanClustererTest {
 
-	private static final String SERIALIZED_CLUSTERS_FILE = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/src/main/resources/clusters.ser";
+	private static final String SERIALIZED_CLUSTERS_FILE = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters.zip";
 
 	public static void main(String[] args) {
 		try {
@@ -107,8 +108,8 @@ public class ExtendedKMeanClustererTest {
 	
 	private ObjectCluster[] loadCLustersFromFile(){
 		ObjectCluster[] clusters = null;
-		try(FileInputStream fileInputStream = new FileInputStream(SERIALIZED_CLUSTERS_FILE);
-			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream)){
+		try(FileInputStream file = new FileInputStream(SERIALIZED_CLUSTERS_FILE);
+			ZipInputStream zip = new ZipInputStream(file);ObjectInputStream oInputStream = new ObjectInputStream(zip)){
 			Object one = oInputStream.readObject();
 			clusters = (ObjectCluster[]) one;
 		} catch (ClassNotFoundException | IOException e) {
@@ -121,9 +122,40 @@ public class ExtendedKMeanClustererTest {
 			FileNotFoundException {
 		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
 		ObjectCluster[] clusters = clusterer.cluster(source);
-		try (FileOutputStream fileStream = new FileOutputStream(SERIALIZED_CLUSTERS_FILE);
-			 ObjectOutputStream os = new ObjectOutputStream(fileStream);) {
+		FileOutputStream fileStream = null;
+		ZipOutputStream zip = null;
+		ObjectOutputStream os = null;
+		try {
+			fileStream = new FileOutputStream(SERIALIZED_CLUSTERS_FILE);
+			zip = new ZipOutputStream(fileStream);
+			zip.putNextEntry(new ZipEntry("clusters.ser"));
+			os = new ObjectOutputStream(zip);
 			os.writeObject(clusters);
+			zip.closeEntry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (zip != null) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }

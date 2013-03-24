@@ -4,7 +4,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
 
@@ -68,12 +71,42 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	}
 
 	private void serializeClustersIntoFile(ObjectCluster[] clusters,int index){
-		try (FileOutputStream fileStream = new FileOutputStream("c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/src/main/resources/clusters-"+index+".ser");
-				 ObjectOutputStream os = new ObjectOutputStream(fileStream);) {
-				os.writeObject(clusters);
-			} catch (Exception e) {
-				e.printStackTrace();
+		String name = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters-"+index+".zip";
+		FileOutputStream fileStream = null;
+		ZipOutputStream zip = null;
+		ObjectOutputStream os = null;
+		try {
+			fileStream = new FileOutputStream(name);
+			zip = new ZipOutputStream(fileStream);
+			zip.putNextEntry(new ZipEntry("clusters-"+index+".ser"));
+			os = new ObjectOutputStream(zip);
+			os.writeObject(clusters);
+			zip.closeEntry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+			if (zip != null) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	/**
 	 * does one itreation of the clusterization 
