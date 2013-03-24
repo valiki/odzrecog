@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.ImageClusterer;
-import by.sunnycore.recognition.image.cluster.KMeansDataClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 /**

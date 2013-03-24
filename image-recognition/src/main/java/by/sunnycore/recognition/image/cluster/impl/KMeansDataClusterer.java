@@ -1,4 +1,4 @@
-package by.sunnycore.recognition.image.cluster;
+package by.sunnycore.recognition.image.cluster.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import by.sunnycore.recognition.image.cluster.impl.EuklidDistanceCounter;
+import by.sunnycore.recognition.image.cluster.DataClusterer;
+import by.sunnycore.recognition.image.cluster.DistanceCounter;
 
 /**
  * Does clusterization using KMeans clustering algorithm
