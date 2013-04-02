@@ -1,5 +1,6 @@
 package by.sunnycore.recognition.image.impl;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DirectColorModel;
 import java.awt.image.PixelGrabber;
@@ -15,6 +16,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import org.math.plot.Plot3DPanel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
@@ -24,7 +29,9 @@ import by.sunnycore.recognition.test.TestUtil;
 
 public class ExtendedKMeanClustererTest {
 
-	private static final String SERIALIZED_CLUSTERS_FILE = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters.zip";
+    public final static Color[] COLORLIST = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.ORANGE, Color.PINK, Color.CYAN, Color.MAGENTA};
+    private static final String SERIALIZED_CLUSTERS_PREFIX = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters";
+	private static final String SERIALIZED_CLUSTERS_FILE = SERIALIZED_CLUSTERS_PREFIX+".zip";
 
 	public static void main(String[] args) {
 		try {
@@ -48,16 +55,20 @@ public class ExtendedKMeanClustererTest {
 		int[] pixels = (int[]) pixelGrabber.getPixels();
 		final DirectColorModel colorModel = (DirectColorModel) pixelGrabber.getColorModel();
 		BufferedImage newImg = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
-		TestUtil.saveImageWithNewName(newImg, "\\.png", "_test.png");
-		clusterImageIntoFile(source);
-		ObjectCluster[] clusters = loadCLustersFromFile();
+		TestUtil.saveImageWithNewName(newImg, "\\.bmp", "_test.png");
+		//clusterImageIntoFile(source);
+		ObjectCluster[] clusters = loadCLustersFromFile(6);
 		Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
-		for(int i=0;i<clusters.length;i++){
+		int clustersNumber = clusters.length;
+		for(int i=0;i<clustersNumber;i++){
 			ObjectCluster objectCluster = clusters[i];
 			int[] c = objectCluster.getClusterCenter();
 			System.out.println(c[0]+","+c[1]+","+c[2]);
-			for(int j=0;j<objectCluster.getClusterPoints().length;j++){
-				int[] pointRGB = objectCluster.getClusterPoints()[j];
+			int[][] points = objectCluster.getClusterPoints();
+			Color newColor = getNewColor(i);
+			objectCluster.setClusterColor(newColor.getRGB());
+			for(int j=0;j<points[0].length;j++){
+				int[] pointRGB = new int[]{points[0][j],points[1][j],points[2][j]};
 				int point = (pointRGB[0]<<16)+(pointRGB[1]<<8)+(pointRGB[2]);
 				classificationMap.put(point,objectCluster);
 			}
@@ -68,19 +79,42 @@ public class ExtendedKMeanClustererTest {
 			pixel = pixel-alpha;
 			ObjectCluster cluster = classificationMap.get(pixel);
 			if(cluster!=null){
-				int[] center = cluster.getClusterCenter();
-				pixels[i]=(center[0]<<16)+(center[1]<<8)+(center[2])+alpha;
+				int center = cluster.getClusterColor();
+				pixels[i]=center;
 			}
 		}
 		BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
-		TestUtil.saveImageWithNewName(newImg1, "\\.png", "_result.png");
+		showResultImageOnFrame(newImg1);
+		
+		TestUtil.saveImageWithNewName(newImg1, "\\.bmp", "_result.png");
 		
 		BufferedImage chart = buildChart(clusters);
 		TestUtil.saveImageWithNewName(chart, "\\.png", "_chart.png");
 		
-		System.out.println("clusters size is: "+clusters.length);
+		System.out.println("clusters size is: "+clustersNumber);
 	}
 
+	private void showResultImageOnFrame(BufferedImage newImg1) {
+		JFrame frame = new JFrame("clustered image");
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new JLabel(new ImageIcon(newImg1)));
+		frame.setSize(newImg1.getWidth(), newImg1.getHeight());
+		/*BufferStrategy bs = frame.getBufferStrategy();
+		if(bs==null){
+			frame.createBufferStrategy(4);
+			bs = frame.getBufferStrategy();
+		}
+		Graphics gc = bs.getDrawGraphics();
+		gc.drawImage(newImg1, 0, 0, newImg1.getWidth(), newImg1.getHeight(), frame);
+		//gc.dispose();
+		bs.show();*/
+	}
+
+    protected Color getNewColor(int index) {
+        return COLORLIST[index];
+    }
+	
 	private BufferedImage buildChart(final ObjectCluster[] clusters){
 		Plot3DPanel chart = new Plot3DPanel();
 		chart.setSize(480, 640);
@@ -107,13 +141,52 @@ public class ExtendedKMeanClustererTest {
 	}
 	
 	private ObjectCluster[] loadCLustersFromFile(){
+		ObjectCluster[] clusters = loadCLustersFromFile(0);
+		return clusters;
+	}
+	
+	private ObjectCluster[] loadCLustersFromFile(int number){
+		ObjectCluster[] clusters = readObjectsFromZip(number);
+		return clusters;
+	}
+
+	private ObjectCluster[] readObjectsFromZip(int number) {
 		ObjectCluster[] clusters = null;
-		try(FileInputStream file = new FileInputStream(SERIALIZED_CLUSTERS_FILE);
-			ZipInputStream zip = new ZipInputStream(file);ObjectInputStream oInputStream = new ObjectInputStream(zip)){
-			Object one = oInputStream.readObject();
+		FileInputStream fileStream = null;
+		ZipInputStream zip = null;
+		ObjectInputStream os = null;
+		try {
+			fileStream = new FileInputStream((number)>0?getClustersFileName(number):SERIALIZED_CLUSTERS_FILE);
+			zip = new ZipInputStream(fileStream);
+			zip.getNextEntry();
+			os = new ObjectInputStream(zip);
+			Object one = os.readObject();
 			clusters = (ObjectCluster[]) one;
-		} catch (ClassNotFoundException | IOException e) {
+			zip.closeEntry();
+		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (zip != null) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return clusters;
 	}
@@ -122,6 +195,10 @@ public class ExtendedKMeanClustererTest {
 			FileNotFoundException {
 		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
 		ObjectCluster[] clusters = clusterer.cluster(source);
+		writeObjectIntoZip(clusters);
+	}
+
+	private void writeObjectIntoZip(ObjectCluster[] clusters) {
 		FileOutputStream fileStream = null;
 		ZipOutputStream zip = null;
 		ObjectOutputStream os = null;
@@ -157,5 +234,9 @@ public class ExtendedKMeanClustererTest {
 				}
 			}
 		}
+	}
+	
+	public String getClustersFileName(int number){
+		return SERIALIZED_CLUSTERS_PREFIX+"-"+number+".zip";
 	}
 }

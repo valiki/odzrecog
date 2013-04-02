@@ -12,7 +12,7 @@ import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class TestUtil {
 
-	private static final String IMAGE_PATH = "images/0020_equalized.png";
+	private static final String IMAGE_PATH = "images/0020.bmp";
 	
 	public static BufferedImage loadImage() throws IOException{
 		return loadImage(IMAGE_PATH);

@@ -22,6 +22,16 @@ public class ObjectCluster implements Serializable {
 	private int[][] clusterPoints;
 
 	private int[] clusterCenter;
+	
+	private int clusterColor;
+
+	public int getClusterColor() {
+		return clusterColor;
+	}
+
+	public void setClusterColor(int clusterColor) {
+		this.clusterColor = clusterColor;
+	}
 
 	public int[][] getClusterPoints() {
 		return clusterPoints;
