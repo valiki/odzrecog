@@ -12,7 +12,7 @@ import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class TestUtil {
 
-	private static final String IMAGE_PATH = "images/0020.bmp";
+	private static final String IMAGE_PATH = "images/0048.bmp";
 	
 	public static BufferedImage loadImage() throws IOException{
 		return loadImage(IMAGE_PATH);
@@ -43,9 +43,13 @@ public class TestUtil {
 	
 	public static void saveImageWithNewName(BufferedImage image,String what,String to) throws IOException{
 		String path = getImagePathString();
-		path = path.replaceAll(what, to);
-		System.out.println(path);
-		ImageUtil.saveImage((BufferedImage) image, new File(path), "png");
+		path = path.substring(0, path.indexOf("."));
+		String newpath = path.replaceAll(what, to);
+		if(newpath.equals(path)){
+			newpath = newpath+to;
+		}
+		System.out.println(newpath);
+		ImageUtil.saveImage((BufferedImage) image, new File(newpath), "png");
 	}
 	
 	public static BufferedImage[] buildHistogramCharts(int[][] buildHistogram) {

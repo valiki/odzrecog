@@ -25,6 +25,7 @@ import org.math.plot.Plot3DPanel;
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.impl.ExtendedKMeansClusterer;
 import by.sunnycore.recognition.image.util.ImageUtil;
+import by.sunnycore.recognition.image.util.ImageUtilTest;
 import by.sunnycore.recognition.test.TestUtil;
 
 public class ExtendedKMeanClustererTest {
@@ -44,12 +45,6 @@ public class ExtendedKMeanClustererTest {
 	
 	public void test() throws IOException{
 		BufferedImage source = TestUtil.loadImage();
-		/*IImageFilter filter = new JAIMedianFilter(10,MedianFilterDescriptor.MEDIAN_MASK_X);
-		BufferedImage median = filter.filter(source);
-		TestUtil.saveImageWithNewName(median, "\\.bmp", "_median.png");*/
-		/*JAIResizeImageTransformer resizeImageTransformer = new JAIResizeImageTransformer(200);
-		BufferedImage resized = resizeImageTransformer.transform(source);
-		TestUtil.saveImageWithNewName(resized, "\\.bmp", "_resized.png");*/
 		PixelGrabber pixelGrabber = new PixelGrabber(source, 0, 0, source.getWidth(), source.getHeight(), true);
 		pixelGrabber.startGrabbing();
 		int[] pixels = (int[]) pixelGrabber.getPixels();
@@ -57,10 +52,10 @@ public class ExtendedKMeanClustererTest {
 		BufferedImage newImg = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
 		TestUtil.saveImageWithNewName(newImg, "\\.bmp", "_test.png");
 		//clusterImageIntoFile(source);
-		ObjectCluster[] clusters = loadCLustersFromFile(6);
-		Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
-		int clustersNumber = clusters.length;
-		for(int i=0;i<clustersNumber;i++){
+		//ObjectCluster[] clusters = loadCLustersFromFile(6);
+		//Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
+		//int clustersNumber = clusters.length;
+		/*for(int i=0;i<clustersNumber;i++){
 			ObjectCluster objectCluster = clusters[i];
 			int[] c = objectCluster.getClusterCenter();
 			System.out.println(c[0]+","+c[1]+","+c[2]);
@@ -82,16 +77,38 @@ public class ExtendedKMeanClustererTest {
 				int center = cluster.getClusterColor();
 				pixels[i]=center;
 			}
+		}*/
+		//BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
+		//showResultImageOnFrame(newImg1);
+		
+		//TestUtil.saveImageWithNewName(newImg1, "\\.bmp", "_result.png");
+		
+		int[][] pointsRGB = new int[3][];//create array for the RGB points for clusterization
+		int numberOfPixels = pixels.length;
+		pointsRGB[0] = new int[numberOfPixels];
+		pointsRGB[1] = new int[numberOfPixels];
+		pointsRGB[2] = new int[numberOfPixels];
+		int count = 0;
+		for(int i=0;i<numberOfPixels;i++){
+			pointsRGB[0][i]=ImageUtil.getRedRaw(pixels[i], colorModel);
+			pointsRGB[1][i]=ImageUtil.getGreenRaw(pixels[i], colorModel);
+			pointsRGB[2][i]=ImageUtil.getBlue(pixels[i], colorModel);
+			if(pointsRGB[0][i] == 255 || pointsRGB[1][i] == 255 || pointsRGB[2][i] == 255){
+				count++;
+				pointsRGB[0][i]=255;
+				pointsRGB[1][i]=0;
+				pointsRGB[2][i]=0;
+			}
 		}
-		BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
-		showResultImageOnFrame(newImg1);
+		System.out.println(count);
+		BufferedImage newImage = ImageUtil.createRGBImageFrom3Channels(source.getWidth(), source.getHeight(), pointsRGB[0], pointsRGB[1], pointsRGB[2]);
+		TestUtil.saveImageWithNewName(newImage, "\\.bmp", "_new_marked.png");
 		
-		TestUtil.saveImageWithNewName(newImg1, "\\.bmp", "_result.png");
+		//BufferedImage chart = buildChart(clusters);
+		BufferedImage chart = buildChart(pointsRGB);
+		//TestUtil.saveImageWithNewName(chart, "\\.bmp", "_chart.png");
 		
-		BufferedImage chart = buildChart(clusters);
-		TestUtil.saveImageWithNewName(chart, "\\.png", "_chart.png");
-		
-		System.out.println("clusters size is: "+clustersNumber);
+		//System.out.println("clusters size is: "+clustersNumber);
 	}
 
 	private void showResultImageOnFrame(BufferedImage newImg1) {
@@ -115,6 +132,24 @@ public class ExtendedKMeanClustererTest {
         return COLORLIST[index];
     }
 	
+    private BufferedImage buildChart(int[][] pixels){
+    	Plot3DPanel chart = new Plot3DPanel();
+		chart.setSize(480, 640);
+		int l = pixels[0].length/50;
+		double[][] datasetPoints = new double[3][l];
+		for(int i=0;i<l;i++){
+			datasetPoints[0][i]=pixels[0][i];
+			datasetPoints[1][i]=pixels[1][i];
+			datasetPoints[2][i]=pixels[2][i];
+		}
+		chart.addScatterPlot("Points", datasetPoints[0],datasetPoints[1],datasetPoints[2]);
+		chart.getAxis(0).setLegend("R");
+		chart.getAxis(1).setLegend("G");
+		chart.getAxis(2).setLegend("B");
+		BufferedImage b = ImageUtil.createImageFromPanel(chart,480,640);
+		return b;
+    }
+    
 	private BufferedImage buildChart(final ObjectCluster[] clusters){
 		Plot3DPanel chart = new Plot3DPanel();
 		chart.setSize(480, 640);

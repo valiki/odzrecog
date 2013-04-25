@@ -9,8 +9,7 @@ public class JAIBitonalImageTransformer implements ImageTransformer{
 
 	@Override
 	public BufferedImage transform(BufferedImage source) {
-		
-		return null;
+		throw new IllegalStateException("Not implemented");
 	}
 
 }

@@ -12,7 +12,6 @@ public class SpectralAngleClusterer implements DataClusterer {
 
 	@Override
 	public short[][][] cluster(short[][] data) {
-		
 		return null;
 	}
 

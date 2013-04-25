@@ -9,8 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-
 import by.sunnycore.recognition.image.cluster.DataClusterer;
 import by.sunnycore.recognition.image.cluster.DistanceCounter;
 
@@ -22,8 +20,7 @@ import by.sunnycore.recognition.image.cluster.DistanceCounter;
  */
 public class KMeansDataClusterer implements DataClusterer{
 	private static final int THREADS_NUMBER = 16;
-
-	private Logger logger = Logger.getLogger(KMeansDataClusterer.class);
+	
 	private static final short EMPTY_DOT_MARKER = Short.MIN_VALUE;
 	private int clustersNumber;
 	private int maxDotsInCluster;
@@ -32,8 +29,6 @@ public class KMeansDataClusterer implements DataClusterer{
 	
 	private ThreadPoolExecutor executor;
 	private List<Future<?>> futureList;
-	
-	private List<Long> times = new ArrayList<>();
 	
 	public short[][] getClusterCenters() {
 		return clusterCenters;
@@ -45,7 +40,6 @@ public class KMeansDataClusterer implements DataClusterer{
 	private short[] result;// cluster j i
 	private short[] dataToUse;
 	private int[] pointsInClusters;
-	private int currentPointsIncluster;
 	/**
 	 * Object that counts distance between two dots
 	 */

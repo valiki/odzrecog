@@ -239,10 +239,7 @@ public class ImageUtil {
 	}
 	
 	public static BufferedImage createRGBImageFrom3Channels(final int width,final int height,final int[] redPixels,final int[] greenPixels,final int[] bluePixels){
-		int[] sumPixels = new int[redPixels.length];
-		for(int i=0;i<redPixels.length;i++){
-			sumPixels[i]=redPixels[i]+greenPixels[i]+bluePixels[i];
-		}
+		int[] sumPixels = rgbToOneDImensionalArray(redPixels, greenPixels, bluePixels);
 		return createImage(sumPixels, width, height);
 	}
 	
@@ -309,10 +306,17 @@ public class ImageUtil {
 	    panel.paint(g);
 	    g.dispose();
 		try {
-			TestUtil.saveImageWithNewName(bi, "\\.png", "_chart.png");
+			TestUtil.saveImageWithNewName(bi, "\\.bmp", "_chart.png");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	    return bi;
+	}
+	
+	public static int[] imageToPixels(BufferedImage source){
+		PixelGrabber pixelGrabber = new PixelGrabber(source, 0, 0, source.getWidth(), source.getHeight(), true);
+		pixelGrabber.startGrabbing();
+		int[] pixels = (int[]) pixelGrabber.getPixels();
+		return pixels;
 	}
 }
