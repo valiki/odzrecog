@@ -2,17 +2,33 @@ package by.sunnycore.recognition.test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import by.sunnycore.recognition.domain.ObjectCluster;
+import by.sunnycore.recognition.image.cluster.impl.ExtendedKMeansClusterer;
 import by.sunnycore.recognition.image.util.ChartUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 public class TestUtil {
 
 	private static final String IMAGE_PATH = "images/0048.bmp";
+	private static final String SERIALIZED_CLUSTERS_PREFIX = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters";
+	private static final String SERIALIZED_CLUSTERS_FILE = SERIALIZED_CLUSTERS_PREFIX+".zip";
+	
+	public static String getClustersFileName(int number){
+		return SERIALIZED_CLUSTERS_PREFIX+"-"+number+".zip";
+	}
 	
 	public static BufferedImage loadImage() throws IOException{
 		return loadImage(IMAGE_PATH);
@@ -78,4 +94,99 @@ public class TestUtil {
 		return result;
 	}
 	
+	public static ObjectCluster[] loadCLustersFromFile(){
+		ObjectCluster[] clusters = loadCLustersFromFile(0);
+		return clusters;
+	}
+	
+	public static ObjectCluster[] loadCLustersFromFile(int number){
+		ObjectCluster[] clusters = readObjectsFromZip(number);
+		return clusters;
+	}
+
+	public static ObjectCluster[] readObjectsFromZip(int number) {
+		ObjectCluster[] clusters = null;
+		FileInputStream fileStream = null;
+		ZipInputStream zip = null;
+		ObjectInputStream os = null;
+		try {
+			fileStream = new FileInputStream((number)>0?getClustersFileName(number):SERIALIZED_CLUSTERS_FILE);
+			zip = new ZipInputStream(fileStream);
+			zip.getNextEntry();
+			os = new ObjectInputStream(zip);
+			Object one = os.readObject();
+			clusters = (ObjectCluster[]) one;
+			zip.closeEntry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (zip != null) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return clusters;
+	}
+	
+	public static void clusterImageIntoFile(BufferedImage source) throws IOException,
+			FileNotFoundException {
+		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
+		ObjectCluster[] clusters = clusterer.cluster(source);
+		writeObjectIntoZip(clusters);
+	}
+	
+	public static void writeObjectIntoZip(ObjectCluster[] clusters) {
+		FileOutputStream fileStream = null;
+		ZipOutputStream zip = null;
+		ObjectOutputStream os = null;
+		try {
+			fileStream = new FileOutputStream(SERIALIZED_CLUSTERS_FILE);
+			zip = new ZipOutputStream(fileStream);
+			zip.putNextEntry(new ZipEntry("clusters.ser"));
+			os = new ObjectOutputStream(zip);
+			os.writeObject(clusters);
+			zip.closeEntry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (zip != null) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

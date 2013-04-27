@@ -151,7 +151,13 @@ public class MaximumLikelyHoodMethod implements DataClusterer{
 			for(ObjectCluster cluster:teachSet){
 				int[][] clusterPoints = cluster.getClusterPoints();
 				double[][] doubleClusterPoints = new double[clusterPoints.length][clusterPoints[0].length];
-				Covariance cov = new Covariance(doubleClusterPoints);
+				double[][] transpondedPoints = new double[clusterPoints[0].length][clusterPoints.length];
+				for(int i=0;i<doubleClusterPoints.length;i++){
+					for(int j=0;j<doubleClusterPoints[i].length;j++){
+						transpondedPoints[j][i]=doubleClusterPoints[i][j];
+					}
+				}
+				Covariance cov = new Covariance(transpondedPoints);
 				RealMatrix covarianceMatrix = cov.getCovarianceMatrix();
 				if(covarianceMatrixes[clusterNumber]==null){
 					covarianceMatrixes[clusterNumber]=covarianceMatrix;
@@ -160,6 +166,7 @@ public class MaximumLikelyHoodMethod implements DataClusterer{
 					//at the we will divide matrix by the teach sets number 
 					covarianceMatrixes[clusterNumber].add(covarianceMatrix);
 				}
+				clusterNumber++;
 			}
 		}
 		for(RealMatrix r:covarianceMatrixes){
