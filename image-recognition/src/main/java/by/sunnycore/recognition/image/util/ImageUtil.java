@@ -225,7 +225,23 @@ public class ImageUtil {
 		return pixelsRGB;
 	}
 	
-	
+	public static int[][] imageTORGBRawArray(BufferedImage img){
+		PixelGrabber pixelGrabber = new PixelGrabber(img, 0, 0, img.getWidth(), img.getHeight(), true);
+		pixelGrabber.startGrabbing();
+		int[] pixels = (int[]) pixelGrabber.getPixels();
+		final ColorModel colorModel = pixelGrabber.getColorModel();
+		int[][] pointsRGB = new int[3][];//create array for the RGB points for clusterization
+		int numberOfPixels = pixels.length;
+		pointsRGB[0] = new int[numberOfPixels];
+		pointsRGB[1] = new int[numberOfPixels];
+		pointsRGB[2] = new int[numberOfPixels];
+		for(int i=0;i<numberOfPixels;i++){
+			pointsRGB[0][i]=ImageUtil.getRedRaw(pixels[i], colorModel);
+			pointsRGB[1][i]=ImageUtil.getGreenRaw(pixels[i], colorModel);
+			pointsRGB[2][i]=ImageUtil.getBlue(pixels[i], colorModel);
+		}
+		return pointsRGB; 
+	}
 	
 	public static BufferedImage createRGBImageFrom3Channels(
 			final int width,final int height,

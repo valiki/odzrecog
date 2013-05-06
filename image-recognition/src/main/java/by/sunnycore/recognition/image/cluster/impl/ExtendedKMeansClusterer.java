@@ -1,8 +1,6 @@
 package by.sunnycore.recognition.image.cluster.impl;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.PixelGrabber;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -13,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.ImageClusterer;
+import by.sunnycore.recognition.image.util.DataUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
 /**
@@ -33,20 +32,8 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	
 	@Override
 	public ObjectCluster[] cluster(BufferedImage source) {
-		PixelGrabber pixelGrabber = new PixelGrabber(source, 0, 0, source.getWidth(), source.getHeight(), true);
-		pixelGrabber.startGrabbing();
-		int[] pixels = (int[]) pixelGrabber.getPixels();
-		final ColorModel colorModel = pixelGrabber.getColorModel();
-		int[][] pointsRGB = new int[3][];//create array for the RGB points for clusterization
-		int numberOfPixels = pixels.length;
-		pointsRGB[0] = new int[numberOfPixels];
-		pointsRGB[1] = new int[numberOfPixels];
-		pointsRGB[2] = new int[numberOfPixels];
-		for(int i=0;i<numberOfPixels;i++){
-			pointsRGB[0][i]=ImageUtil.getRedRaw(pixels[i], colorModel);
-			pointsRGB[1][i]=ImageUtil.getGreenRaw(pixels[i], colorModel);
-			pointsRGB[2][i]=ImageUtil.getBlue(pixels[i], colorModel);
-		}
+		int[][] pointsRGB = ImageUtil.imageTORGBRawArray(source);
+		int numberOfPixels = pointsRGB[0].length;
 		ObjectCluster[] theBestClusters = null;
 		double minValidity = Double.MAX_VALUE;
 		logger.info("the number of points are: "+numberOfPixels);
@@ -117,63 +104,19 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	private ObjectCluster[] doKMeansIteration(int[][] pointsRGB, int clusterNumber) {
 		try {
 			KMeansDataClusterer clusterer = new KMeansDataClusterer(clusterNumber);
-			//KMeans clusterer = new KMeans(clusterNumber);
 			logger.info(" creating dataset from array of pixels");
-			//Dataset clusterDataSet = JavaMlUtil.arrayToDataSet(pointsRGB);
 			logger.info("clustering using clusterer");
-			//Dataset[] clusters = clusterer.cluster(clusterDataSet);
-			short[][] data = intToShort(pointsRGB);
+			short[][] data = DataUtil.intToShort(pointsRGB);
 			short[][][] res = clusterer.cluster(data);
-			ObjectCluster[] result = new ObjectCluster[clusterNumber];
-			//the coordinates of the cluster centers
-/*			Field centrodsField = KMeans.class.getDeclaredField("centroids");
-			centrodsField.setAccessible(true);
-			Instance[] centroids = (Instance[]) centrodsField.get(clusterer);*/
 			logger.info("dataset to object clusters");
 			short[][] clusterCenters = clusterer.getClusterCenters();
-			for(int i=0;i<res.length;i++){
-				ObjectCluster objCluster = new ObjectCluster();
-				result[i]=objCluster;
-				//Dataset cluster = clusters[i];
-				//int[][] clusterPoints = JavaMlUtil.dataSetToArray(cluster);
-				int[][] clusterPoints = shortToInt(res[i]);
-				objCluster.setClusterPoints(clusterPoints);
-/*				Instance center = centroids[i];*/
-				int[] centerInt = shortToInt(clusterCenters[i]);
-				objCluster.setClusterCenter(centerInt);
-			}
+			ObjectCluster[] result = DataUtil.shortToObjectClusters(res, clusterCenters);
 			clusterer.destroy();
 			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 		}
 		return null;
-	}
-
-	private short[][] intToShort(int[][] pointsRGB) {
-		short[][] data = new short[pointsRGB.length][pointsRGB[0].length];
-		for(int i=0;i<pointsRGB.length;i++){
-			for(int j=0;j<pointsRGB[0].length;j++){
-				data[i][j] = (short) pointsRGB[i][j];
-			}
-		}
-		return data;
-	}
-	
-	private int[][] shortToInt(short[][] data){
-		int[][] data1 = new int[data.length][data[0].length];
-		for(int i=0;i<data.length;i++){
-			data1[i] = shortToInt(data[i]);
-		}
-		return data1;
-	}
-	
-	private int[] shortToInt(short[] data){
-		int[] data1 = new int[data.length];
-		for(int i=0;i<data.length;i++){
-			data1[i] = (int) data[i];
-		}
-		return data1;
 	}
 
 	/**

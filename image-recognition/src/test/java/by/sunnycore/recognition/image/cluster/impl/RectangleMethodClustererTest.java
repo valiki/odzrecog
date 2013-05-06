@@ -13,28 +13,23 @@ import by.sunnycore.recognition.image.util.DataUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.test.TestUtil;
 
-public class MaximumLikelyHoodMethodTest extends AbstractTeachableClusterizationMethodTest{
+public class RectangleMethodClustererTest extends AbstractTeachableClusterizationMethodTest{
 	
-	private Logger logger = Logger.getLogger(MaximumLikelyHoodMethodTest.class);
+	private Logger logger = Logger.getLogger(RectangleMethodClustererTest.class);
 	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		MaximumLikelyHoodMethodTest t = new MaximumLikelyHoodMethodTest();
-		t.executeMaximumLikelyHoodMethod();
+		RectangleMethodClustererTest test = new RectangleMethodClustererTest();
+		test.executeRectangleMethod();
 	}
 	
-	
-	
-	public void executeMaximumLikelyHoodMethod() throws IOException{
-		logger.debug("Creating Maximum LikelyHood Method Clusterer.");
-		MaximumLikelyHoodMethod m = new MaximumLikelyHoodMethod();
+	public void executeRectangleMethod() throws IOException{
+		logger.debug("Creating Rectangle Method clusterer");
+		RectangleMethodClusterer m = new RectangleMethodClusterer();
 		logger.debug("Loading Teach data from disk.");
-		/*ObjectCluster[] clusters = loadTestTEachData();
-		List<ObjectCluster[]> teachData = new ArrayList<>();
-		teachData.add(clusters);*/
 		List<ObjectCluster[]> teachData = loadTeachData();
 		logger.debug("Start Teaching Clusterer");
 		long time = System.currentTimeMillis();
@@ -61,7 +56,7 @@ public class MaximumLikelyHoodMethodTest extends AbstractTeachableClusterization
 		}
 		ObjectCluster[] objectClusters = DataUtil.shortToObjectClusters(result, clusterCenters);
 		BufferedImage markedImage = ClusteringUtil.markClustersOnSourceImage(objectClusters, image);
-		TestUtil.saveImageWithNewName(markedImage, "\\.bmp", "_max_like.png");
+		TestUtil.saveImageWithNewName(markedImage, "\\.bmp", "_rectangle.png");
 	}
 
 }

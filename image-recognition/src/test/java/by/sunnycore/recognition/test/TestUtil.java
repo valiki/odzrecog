@@ -3,7 +3,6 @@ package by.sunnycore.recognition.test;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +15,6 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
-import by.sunnycore.recognition.image.cluster.impl.ExtendedKMeansClusterer;
 import by.sunnycore.recognition.image.util.ChartUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 
@@ -143,13 +141,6 @@ public class TestUtil {
 			}
 		}
 		return clusters;
-	}
-	
-	public static void clusterImageIntoFile(BufferedImage source) throws IOException,
-			FileNotFoundException {
-		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
-		ObjectCluster[] clusters = clusterer.cluster(source);
-		writeObjectIntoZip(clusters);
 	}
 	
 	public static void writeObjectIntoZip(ObjectCluster[] clusters) {
