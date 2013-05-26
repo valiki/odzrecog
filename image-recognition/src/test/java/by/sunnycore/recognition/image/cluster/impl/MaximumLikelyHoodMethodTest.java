@@ -36,12 +36,15 @@ public class MaximumLikelyHoodMethodTest extends AbstractTeachableClusterization
 		List<ObjectCluster[]> teachData = new ArrayList<>();
 		teachData.add(clusters);*/
 		List<ObjectCluster[]> teachData = loadTeachData();
+		teachData = enhanceData(teachData);
 		logger.debug("Start Teaching Clusterer");
 		long time = System.currentTimeMillis();
 		m.teach(teachData);
 		logger.info("Teaching took "+(System.currentTimeMillis()-time)+"ms");
-		BufferedImage image = TestUtil.loadImage("images/0048_cont.bmp");
+		BufferedImage image = TestUtil.loadImage("images/0048.bmp");
 		int[][] rgb = ImageUtil.imageTORGBRawArray(image);
+		rgb = filterLightedPixels(rgb);
+		rgb = enhancePixels(rgb);
 		short[][] data = new short[rgb.length][rgb[0].length];
 		for(int i=0;i<rgb.length;i++){
 			for(int j=0;j<rgb[0].length;j++){
@@ -62,6 +65,7 @@ public class MaximumLikelyHoodMethodTest extends AbstractTeachableClusterization
 		ObjectCluster[] objectClusters = DataUtil.shortToObjectClusters(result, clusterCenters);
 		BufferedImage markedImage = ClusteringUtil.markClustersOnSourceImage(objectClusters, image);
 		TestUtil.saveImageWithNewName(markedImage, "\\.bmp", "_max_like.png");
+		ClusteringUtil.buildChart(objectClusters);
 	}
 
 }

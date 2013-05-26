@@ -1,6 +1,9 @@
 package by.sunnycore.recognition.image.cluster.impl;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
+import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,12 +34,15 @@ public class RectangleMethodClustererTest extends AbstractTeachableClusterizatio
 		RectangleMethodClusterer m = new RectangleMethodClusterer();
 		logger.debug("Loading Teach data from disk.");
 		List<ObjectCluster[]> teachData = loadTeachData();
+		teachData = enhanceData(teachData);
 		logger.debug("Start Teaching Clusterer");
 		long time = System.currentTimeMillis();
 		m.teach(teachData);
 		logger.info("Teaching took "+(System.currentTimeMillis()-time)+"ms");
-		BufferedImage image = TestUtil.loadImage("images/0048_cont.bmp");
+		BufferedImage image = TestUtil.loadImage("images/0048.bmp");
 		int[][] rgb = ImageUtil.imageTORGBRawArray(image);
+		rgb = filterLightedPixels(rgb);
+		rgb = enhancePixels(rgb);
 		short[][] data = new short[rgb.length][rgb[0].length];
 		for(int i=0;i<rgb.length;i++){
 			for(int j=0;j<rgb[0].length;j++){
@@ -55,8 +61,30 @@ public class RectangleMethodClustererTest extends AbstractTeachableClusterizatio
 			}
 		}
 		ObjectCluster[] objectClusters = DataUtil.shortToObjectClusters(result, clusterCenters);
-		BufferedImage markedImage = ClusteringUtil.markClustersOnSourceImage(objectClusters, image);
+		PixelGrabber pixelGrabber = new PixelGrabber(image, 0, 0, image.getWidth(), image.getHeight(), true);
+		pixelGrabber.startGrabbing();
+		int[] pixels = (int[]) pixelGrabber.getPixels();
+		int width = image.getWidth();
+		int height = image.getHeight();
+		final ColorModel colorModel = pixelGrabber.getColorModel();
+		BufferedImage markedImage = ClusteringUtil.markClustersOnSourceImage(objectClusters, pixels,colorModel,width,height);
+		//objectClusters = addUnclassifiedToObjectClusters(objectClusters, pixels, colorModel);
+		
+		BufferedImage chart = ClusteringUtil.buildChart(objectClusters);
 		TestUtil.saveImageWithNewName(markedImage, "\\.bmp", "_rectangle.png");
+		TestUtil.saveImageWithNewName(chart, "\\.bmp", "_rectangle_chart.png");
+	}
+
+	private ObjectCluster[] addUnclassifiedToObjectClusters(
+			ObjectCluster[] objectClusters, int[] pixels,
+			final ColorModel colorModel) {
+		ObjectCluster unclassified = ClusteringUtil.fetchUnclasifiedPixels(objectClusters, pixels, colorModel);
+		ObjectCluster[] wUnclassifiedClusters = new ObjectCluster[objectClusters.length+1];
+		for(int i=0;i<objectClusters.length;i++){
+			wUnclassifiedClusters[i]=objectClusters[i];
+		}
+		wUnclassifiedClusters[objectClusters.length]=unclassified;
+		return wUnclassifiedClusters;
 	}
 
 }

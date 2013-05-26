@@ -128,6 +128,7 @@ public class MathUtil {
 				}
 				RealMatrix exp = mathExpectations[i];
 				double[][] center = ((Array2DRowRealMatrix)exp).getData();
+				
 				for(int j=0;j<dPoints[0].length;j++){
 					for(int k=0;k<dPoints.length;k++){
 						dispersion[k]+=Math.pow(dPoints[k][j]-center[k][0],2);

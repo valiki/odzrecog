@@ -15,7 +15,7 @@ public class MedianFilterTest {
 	@Test
 	public void test() throws IOException{
 		BufferedImage source = TestUtil.loadImage();
-		ImageFilter filter = new JAIMedianFilter(10,MedianFilterDescriptor.MEDIAN_MASK_X);
+		ImageFilter filter = new JAIMedianFilter(5,MedianFilterDescriptor.MEDIAN_MASK_X);
 		BufferedImage result = filter.filter(source);
 		String name = "_median";
 		TestUtil.saveImageWithNewName(result, "\\.bmp", name+".png");

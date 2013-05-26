@@ -24,6 +24,16 @@ public class DataUtil {
 		return doublePoints;
 	}
 	
+	public static int[][] doubleToInt(double[][] data){
+		int[][] doublePoints = new int[data.length][data[0].length];
+		for(int i=0;i<data.length;i++){
+			for(int j=0;j<data[i].length;j++){
+				doublePoints[i][j]=(int) data[i][j];
+			}
+		}
+		return doublePoints;
+	}
+	
 	public static double[][] intToDoubleTransponded(int[][] data){
 		double[][] doublePoints = new double[data[0].length][data.length];
 		for(int i=0;i<data[0].length;i++){
@@ -56,6 +66,14 @@ public class DataUtil {
 		int[] data1 = new int[data.length];
 		for(int i=0;i<data.length;i++){
 			data1[i] = (int) data[i];
+		}
+		return data1;
+	}
+	
+	public static double[] shortToDouble(short[] data){
+		double[] data1 = new double[data.length];
+		for(int i=0;i<data.length;i++){
+			data1[i] = (double) data[i];
 		}
 		return data1;
 	}

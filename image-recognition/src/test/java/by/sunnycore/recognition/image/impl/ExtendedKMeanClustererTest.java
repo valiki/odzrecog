@@ -39,8 +39,9 @@ public class ExtendedKMeanClustererTest {
 		BufferedImage newImg = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
 		TestUtil.saveImageWithNewName(newImg, "\\.bmp", "_test.png");
 		//clusterImageIntoFile(source);
-		ObjectCluster[] clusters = TestUtil.loadCLustersFromFile(6);
-		ClusteringUtil.markDotsWithTooLightedValues(source,"_6_clusters");
+		ObjectCluster[] clusters = TestUtil.loadCLustersFromFile(4);
+		BufferedImage img = ClusteringUtil.markClustersOnSourceImage(clusters, source);
+		//ClusteringUtil.markDotsWithTooLightedValues(source,"_4_clusters");
 		//Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
 		//int clustersNumber = clusters.length;
 		/*for(int i=0;i<clustersNumber;i++){
@@ -69,7 +70,7 @@ public class ExtendedKMeanClustererTest {
 		//BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
 		//showResultImageOnFrame(newImg1);
 		
-		//TestUtil.saveImageWithNewName(newImg1, "\\.bmp", "_result.png");
+		TestUtil.saveImageWithNewName(img, "\\.bmp", "_kmeans_4_.png");
 		
 		
 		//BufferedImage chart = buildChart(clusters);

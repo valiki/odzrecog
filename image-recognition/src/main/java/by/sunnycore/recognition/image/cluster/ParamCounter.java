@@ -7,5 +7,5 @@ package by.sunnycore.recognition.image.cluster;
  * 
  */
 public interface ParamCounter {
-	double[] count(double[] data);
+	double count(double[] v1, double[] v2);
 }

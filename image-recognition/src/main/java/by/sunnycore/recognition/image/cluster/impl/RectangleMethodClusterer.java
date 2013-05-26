@@ -1,5 +1,6 @@
 package by.sunnycore.recognition.image.cluster.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -29,6 +30,8 @@ public class RectangleMethodClusterer implements DataClusterer, TeachableMethod 
 	
 	private DistanceCounter counter = new EuklidDistanceCounter();
 
+	private DistanceCounter[] counters;
+	
 	public RealMatrix[] getDispersions() {
 		return dispersions;
 	}
@@ -62,7 +65,13 @@ public class RectangleMethodClusterer implements DataClusterer, TeachableMethod 
 		for(int i=0;i<clustersNumber;i++){
 			double[][] mathExpectationArray = ((Array2DRowRealMatrix)mathExpectations[i]).getData();
 			double[][] dispersionArray = ((Array2DRowRealMatrix)dispersions[i]).getData();
+			double[] center = new double[mathExpectationArray.length];
+			for(int j=0;j<mathExpectationArray.length;j++){
+				center[j]=mathExpectationArray[j][0];
+			}
 			boolean liesInside = true;
+			double[] lastCenter = new double[mathExpectationArray.length];
+			double lastDistance = 0;
 			for(int j=0;j<pixel.length;j++){
 				double mathExpBin = mathExpectationArray[j][0];
 				double dispersionBin = dispersionArray[j][0];
@@ -77,11 +86,24 @@ public class RectangleMethodClusterer implements DataClusterer, TeachableMethod 
 				//mean the dot is inside the square of necessary size
 				if (cluster==-1) {
 					cluster = i;
+					for(int j=0;j<mathExpectationArray.length;j++){
+						lastCenter[j]=center[j];
+					}
+					lastDistance = counters[i].countDistance(center, pixel);
+					//System.out.println("euklid distance versus mahalanobis: "+lastDistance+", "+length);
 				}else{
 					//if this is scond cluster where the dots lies in
 					//mean it lies inside two clusters and we can not classifiy it
-					cluster = -1;
-					break;
+					//cluster = -1;
+					//break;
+					double distance = counters[i].countDistance(center, pixel);
+					if(distance<lastDistance){
+						cluster = i;
+					}
+					for(int j=0;j<mathExpectationArray.length;j++){
+						lastCenter[j]=center[j];
+					}
+					lastDistance = distance;
 				}
 			}
 		}
@@ -90,6 +112,14 @@ public class RectangleMethodClusterer implements DataClusterer, TeachableMethod 
 	
 	@Override
 	public void teach(List<ObjectCluster[]> teachData) {
+		counters = new DistanceCounter[teachData.get(0).length];
+		for(int i=0;i<counters.length;i++){
+			List<ObjectCluster> clusterData = new ArrayList<>();
+			for(int j=0;j<teachData.size();j++){
+				clusterData.add(teachData.get(j)[i]);
+			}
+			counters[i]=new EuklidDistanceCounter();//new MahalanobisDistanceCounter(clusterData);
+		}
 		clustersNumber = teachData.get(0).length;
 		init();
 		mathExpectations = MathUtil.buildMathExpectations(teachData);

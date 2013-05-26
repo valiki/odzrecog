@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
+import by.sunnycore.recognition.image.util.ClusteringUtil;
+import by.sunnycore.recognition.image.util.DataUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.image.util.Point;
 import by.sunnycore.recognition.test.TestUtil;
@@ -23,7 +25,25 @@ public abstract class AbstractTeachableClusterizationMethodTest {
 	
 	private Logger logger = Logger.getLogger(AbstractTeachableClusterizationMethodTest.class);
 
-	private String[] classNames = new String[] {"field","road","water"};
+	private String[] classNames = new String[] {"field","forest","water","road"};
+	
+	public List<ObjectCluster[]> enhanceData(List<ObjectCluster[]> data){
+		for(ObjectCluster[] clusters:data){
+			for(int i=0;i<clusters.length;i++){
+				int[][] clusterPoints = clusters[i].getClusterPoints();
+				int[][] enhancedPixels = enhancePixels(clusterPoints);
+				clusters[i].setClusterPoints(enhancedPixels);
+			}
+		}
+		return data;
+	}
+
+	public int[][] enhancePixels(int[][] clusterPoints) {
+		double[][] dClusterPoints = DataUtil.intToDouble(clusterPoints);
+		dClusterPoints = ClusteringUtil.addParamBands(dClusterPoints, new SpectralAngleCounter());
+		int[][] enhancedPixels = DataUtil.doubleToInt(dClusterPoints);
+		return enhancedPixels;
+	}
 	
 	public List<ObjectCluster[]> loadTeachData() throws IOException{
 		URL r = MaximumLikelyHoodMethodTest.class.getClassLoader().getResource("images/teach");
@@ -82,12 +102,39 @@ public abstract class AbstractTeachableClusterizationMethodTest {
 				BufferedImage img = ImageUtil.loadImage(file);
 				int[][] pixels = ImageUtil.imageTORGBRawArray(img);
 				ObjectCluster objectCluster = new ObjectCluster();
+				pixels = filterLightedPixels(pixels);
 				objectCluster.setClusterPoints(pixels);
 				teachSet[clusterNumber]=objectCluster;
 			}
 			clusterNumber++;
 		}
 		return teachData;
+	}
+
+	public int[][] filterLightedPixels(int[][] pixels) {
+		return pixels;
+		/*int number = 0;
+		for(int j=0;j<pixels[0].length;j++){
+			for(int k=0;k<pixels.length;k++){
+				if(pixels[k][j]>253){
+					continue;
+				}
+			}
+			number++;
+		}
+		int[][] filteredPixels = new int[pixels.length][number];
+		number = 0;
+		for(int j=0;j<pixels[0].length;j++){
+			for(int k=0;k<pixels.length;k++){
+				if(pixels[k][j]>253){
+					continue;
+				}else{
+					filteredPixels[k][number]=pixels[k][j];
+				}
+			}
+			number++;
+		}
+		return filteredPixels;*/
 	}
 	
 	protected ObjectCluster[] loadTestTEachData() {
