@@ -8,16 +8,26 @@ import by.bsu.nummethods.gauss.GaussMethod;
 
 /**
  * 
- * @author Valiantsin Shukaila This class counts value of function in a point
+ * This class counts value of function in a point
  *         using cube splain method of interpolation
+ * 
+ * @author Valiantsin Shukaila 
+ * 
  */
-public class CubeSplainMethod implements IInterpolation, IFunction {
+public class CubeSplineMethod implements IInterpolation, IFunction {
 
-	private static Logger logger = Logger.getLogger(CubeSplainMethod.class);
+	private static Logger logger = Logger.getLogger(CubeSplineMethod.class);
 
 	private double[] initXAll;
 	private double[] initYAll;
 
+	public CubeSplineMethod() {
+	}
+	
+	public CubeSplineMethod(double[] xData, double[] yData){
+		this.initXAll = xData;
+		this.initYAll = yData;
+	}
 	/**
 	 * 
 	 * @param fx
