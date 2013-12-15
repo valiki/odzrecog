@@ -9,21 +9,17 @@ import org.jfree.data.xy.DefaultXYDataset;
 
 public class ChartUtil {
 	public static BufferedImage buildChart(double[][] data,String title,String xl,String yl,int width,int height,final String type){
-		JFreeChart chart = buildChart(data, title, xl, yl,type);
+		JFreeChart chart = buildChart(title, xl, yl,type,new String[]{"Chart"},data);
 		return chart.createBufferedImage(width, height);
 	}
-
-	private static JFreeChart buildChart(double[][] data,final String title,
-			String xl, String yl,String type) {
+	
+	public static JFreeChart buildChart(final String title,
+			String xl, String yl,String type,String[] titles,double[][]... data) {
 		DefaultXYDataset dataset = new DefaultXYDataset();
-		@SuppressWarnings("rawtypes")
-		Comparable key = new Comparable() {
-			@Override
-			public int compareTo(Object o) {
-				return 0;
-			}
-		};
-		dataset.addSeries(key, data);
+		for(int i=0;i<data.length;i++){
+			double[][] series = data[i];
+			dataset.addSeries(titles[i], series);
+		}
 		JFreeChart chart;
 		switch (type) {
 		case "line":

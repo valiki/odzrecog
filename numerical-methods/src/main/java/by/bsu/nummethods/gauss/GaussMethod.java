@@ -43,19 +43,19 @@ public class GaussMethod {
 	 */
 	public static void executeForwardTrace(double[][] a){
 		double c;
-		for(int i=0;i<4;i++){
-			for(int k=i+1;k<3+1;k++){
-				for(int m=k;m<3;m++){
+		for(int i=0;i<a.length;i++){
+			for(int k=i;k<a[i].length;k++){
+				for(int m=k;m<a[i].length;m++){
 					if(a[i][m]>a[i][k]&&m!=k){
 						changePlaceOfEquations(a, k, m);
 					}
 				}
 				c=a[k][i]/a[i][i];
 				a[k][i]=0;
-				for(int j=i+1;j<3+1;j++){
+				for(int j=i+1;j<a[i].length;j++){
 					a[k][j]=a[k][j]-c*a[i][j];
 				}
-				a[k][4]=a[k][4]-c*a[i][4];
+				a[k][a.length]=a[k][a.length]-c*a[i][a.length];
 				}
 			}
 	}
