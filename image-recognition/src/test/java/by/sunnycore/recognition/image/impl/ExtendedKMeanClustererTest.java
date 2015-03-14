@@ -13,13 +13,11 @@ import javax.swing.JLabel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.impl.ExtendedKMeansClusterer;
-import by.sunnycore.recognition.image.util.ClusteringUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class ExtendedKMeanClustererTest {
-    private static final String SERIALIZED_CLUSTERS_PREFIX = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters";
-	private static final String SERIALIZED_CLUSTERS_FILE = SERIALIZED_CLUSTERS_PREFIX+".zip";
+	public final static Color[] COLORLIST = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.ORANGE, Color.PINK, Color.CYAN, Color.MAGENTA};
 
 	public static void main(String[] args) {
 		try {
@@ -37,40 +35,40 @@ public class ExtendedKMeanClustererTest {
 		int[] pixels = (int[]) pixelGrabber.getPixels();
 		final DirectColorModel colorModel = (DirectColorModel) pixelGrabber.getColorModel();
 		BufferedImage newImg = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
-		TestUtil.saveImageWithNewName(newImg, "\\.bmp", "_test.png");
-		//clusterImageIntoFile(source);
-		ObjectCluster[] clusters = TestUtil.loadCLustersFromFile(4);
-		BufferedImage img = ClusteringUtil.markClustersOnSourceImage(clusters, source);
-		//ClusteringUtil.markDotsWithTooLightedValues(source,"_4_clusters");
-		//Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
-		//int clustersNumber = clusters.length;
-		/*for(int i=0;i<clustersNumber;i++){
-			ObjectCluster objectCluster = clusters[i];
-			int[] c = objectCluster.getClusterCenter();
-			System.out.println(c[0]+","+c[1]+","+c[2]);
-			int[][] points = objectCluster.getClusterPoints();
-			Color newColor = getNewColor(i);
-			objectCluster.setClusterColor(newColor.getRGB());
-			for(int j=0;j<points[0].length;j++){
-				int[] pointRGB = new int[]{points[0][j],points[1][j],points[2][j]};
-				int point = (pointRGB[0]<<16)+(pointRGB[1]<<8)+(pointRGB[2]);
-				classificationMap.put(point,objectCluster);
-			}
-		}
-		for(int i=0;i<pixels.length;i++){
-			int pixel = pixels[i];
-			int alpha = colorModel.getAlpha(pixel)<<24;
-			pixel = pixel-alpha;
-			ObjectCluster cluster = classificationMap.get(pixel);
-			if(cluster!=null){
-				int center = cluster.getClusterColor();
-				pixels[i]=center;
-			}
-		}*/
-		//BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
-		//showResultImageOnFrame(newImg1);
+		TestUtil.saveImageWithNewName(newImg, "\\.nef", "_test.png");
+		clusterImageIntoFile(source);
+		//ObjectCluster[] clusters = TestUtil.loadCLustersFromFile(4);
+		//BufferedImage img = ClusteringUtil.markClustersOnSourceImage(clusters, source);
+//		ClusteringUtil.markDotsWithTooLightedValues(source,"_4_clusters");
+//		Map<Integer,ObjectCluster> classificationMap = new HashMap<Integer, ObjectCluster>();
+//		int clustersNumber = clusters.length;
+//		for(int i=0;i<clustersNumber;i++){
+//			ObjectCluster objectCluster = clusters[i];
+//			int[] c = objectCluster.getClusterCenter();
+//			System.out.println(c[0]+","+c[1]+","+c[2]);
+//			int[][] points = objectCluster.getClusterPoints();
+//			Color newColor = getNewColor(i);
+//			objectCluster.setClusterColor(newColor.getRGB());
+//			for(int j=0;j<points[0].length;j++){
+//				int[] pointRGB = new int[]{points[0][j],points[1][j],points[2][j]};
+//				int point = (pointRGB[0]<<16)+(pointRGB[1]<<8)+(pointRGB[2]);
+//				classificationMap.put(point,objectCluster);
+//			}
+//		}
+//		for(int i=0;i<pixels.length;i++){
+//			int pixel = pixels[i];
+//			int alpha = colorModel.getAlpha(pixel)<<24;
+//			pixel = pixel-alpha;
+//			ObjectCluster cluster = classificationMap.get(pixel);
+//			if(cluster!=null){
+//				int center = cluster.getClusterColor();
+//				pixels[i]=center;
+//			}
+//		}
+//		BufferedImage newImg1 = ImageUtil.createImage(pixels, source.getWidth(), source.getHeight());
+//		showResultImageOnFrame(newImg1);
 		
-		TestUtil.saveImageWithNewName(img, "\\.bmp", "_kmeans_4_.png");
+		//TestUtil.saveImageWithNewName(img, "\\.nef", "_kmeans_4_.png");
 		
 		
 		//BufferedImage chart = buildChart(clusters);
@@ -79,6 +77,10 @@ public class ExtendedKMeanClustererTest {
 		//TestUtil.saveImageWithNewName(chart, "\\.bmp", "_chart.png");
 	}
 
+	protected Color getNewColor(int index) {
+        return COLORLIST[index];
+    }
+	
 	public void clusterImageIntoFile(BufferedImage source) throws IOException, FileNotFoundException {
 		ExtendedKMeansClusterer clusterer = new ExtendedKMeansClusterer();
 		ObjectCluster[] clusters = clusterer.cluster(source);

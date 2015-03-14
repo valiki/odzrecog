@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import by.sunnycore.recognition.image.transformer.ImageTransformer;
 import by.sunnycore.recognition.image.util.ImageUtil;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 /**
  * Image Transformer that splits image into parts and transform each part

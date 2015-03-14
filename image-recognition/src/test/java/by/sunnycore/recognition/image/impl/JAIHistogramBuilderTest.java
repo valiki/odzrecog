@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 import by.sunnycore.recognition.image.histogram.impl.JAIHistogramBuilder;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class JAIHistogramBuilderTest {
 	

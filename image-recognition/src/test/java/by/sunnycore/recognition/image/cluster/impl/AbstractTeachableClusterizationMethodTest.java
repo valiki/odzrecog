@@ -19,7 +19,7 @@ import by.sunnycore.recognition.image.util.ClusteringUtil;
 import by.sunnycore.recognition.image.util.DataUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
 import by.sunnycore.recognition.image.util.Point;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public abstract class AbstractTeachableClusterizationMethodTest {
 	

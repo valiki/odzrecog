@@ -3,5 +3,6 @@
 /.project
 /mylog.log
 /clusters
-
+.springBeans
+.DS_Store
 *Thumbs.db

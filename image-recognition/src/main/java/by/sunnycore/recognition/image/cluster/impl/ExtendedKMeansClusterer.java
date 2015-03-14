@@ -26,7 +26,7 @@ import by.sunnycore.recognition.image.util.ImageUtil;
 public class ExtendedKMeansClusterer implements ImageClusterer {
 
 	private static final int MIN_CLUSTERS_NUMBER = 3;
-	private static final int MAX_CLUSTERS_NUMBER = 25;
+	private static final int MAX_CLUSTERS_NUMBER = 10;
 
 	private Logger logger = Logger.getLogger(ExtendedKMeansClusterer.class);
 	
@@ -57,7 +57,7 @@ public class ExtendedKMeansClusterer implements ImageClusterer {
 	}
 
 	private void serializeClustersIntoFile(ObjectCluster[] clusters,int index){
-		String name = "c:/Users/Val/Documents/GitHub/odzrecog/image-recognition/clusters/clusters-"+index+".zip";
+		String name = "/Users/user/Documents/phd/repos/phd/fssviewer/static-resources/clusters/clusters-"+index+".zip";
 		FileOutputStream fileStream = null;
 		ZipOutputStream zip = null;
 		ObjectOutputStream os = null;

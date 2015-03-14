@@ -6,7 +6,7 @@ import java.io.IOException;
 import by.sunnycore.recognition.image.transformer.ImageTransformer;
 import by.sunnycore.recognition.image.transformer.impl.ImagePartsTransformer;
 import by.sunnycore.recognition.image.transformer.impl.JAIHistogramNormalizationTransformer;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class ImagePartsTransformerTest {
 

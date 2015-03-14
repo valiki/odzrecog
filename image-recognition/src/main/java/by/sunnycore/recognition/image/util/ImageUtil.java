@@ -1,8 +1,6 @@
 package by.sunnycore.recognition.image.util;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
@@ -15,8 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
-
-import by.sunnycore.recognition.test.TestUtil;
 
 /**
  * an utility class for image processing
@@ -36,7 +32,7 @@ public class ImageUtil {
 	 * @return
 	 */
 	public static int getRed(final int pixel, final ColorModel colorModel) {
-		return colorModel.getRed(pixel)<<16;
+		return colorModel.getRed(pixel);//<<16;
 	}
 
 	/**
@@ -48,7 +44,7 @@ public class ImageUtil {
 	 * @return
 	 */
 	public static int getGreen(final int pixel, final ColorModel colorModel) {
-		return colorModel.getGreen(pixel)<<8;
+		return colorModel.getGreen(pixel);//<<8;
 	}
 
 	/**
@@ -196,11 +192,15 @@ public class ImageUtil {
 		return createImage(bluePixels, width, height);
 	}
 	
-	public static int[] grabPixels(BufferedImage image){
-		PixelGrabber pixelGrabber = new PixelGrabber(image, 0, 0, image.getWidth(), image.getHeight(), true);
+	public static int[] grabPixels(BufferedImage image, boolean forceRGB){
+		PixelGrabber pixelGrabber = new PixelGrabber(image, 0, 0, image.getWidth(), image.getHeight(), forceRGB);
 		pixelGrabber.startGrabbing();
 		int[] pixels = (int[]) pixelGrabber.getPixels();
 		return pixels;
+	}
+	
+	public static int[] grabPixels(BufferedImage image){
+		return grabPixels(image, true);
 	}
 	
 	public static int[][] loadImageRBGArray(String path) throws IOException{
@@ -235,7 +235,7 @@ public class ImageUtil {
 		pointsRGB[0] = new int[numberOfPixels];
 		pointsRGB[1] = new int[numberOfPixels];
 		pointsRGB[2] = new int[numberOfPixels];
-		for(int i=0;i<numberOfPixels;i++){
+		for (int i=0;i<numberOfPixels;i++) {
 			pointsRGB[0][i]=ImageUtil.getRedRaw(pixels[i], colorModel);
 			pointsRGB[1][i]=ImageUtil.getGreenRaw(pixels[i], colorModel);
 			pointsRGB[2][i]=ImageUtil.getBlue(pixels[i], colorModel);
@@ -334,5 +334,10 @@ public class ImageUtil {
 		pixelGrabber.startGrabbing();
 		int[] pixels = (int[]) pixelGrabber.getPixels();
 		return pixels;
+	}
+	
+	public static short getPixel(short[] fullArray, int channels, int index, int channelIndex){
+		int realIndex = index * channels + channelIndex;
+		return fullArray[realIndex];
 	}
 }

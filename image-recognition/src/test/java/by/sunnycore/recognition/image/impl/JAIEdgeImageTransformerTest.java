@@ -9,7 +9,7 @@ import by.sunnycore.recognition.image.filter.ImageFilter;
 import by.sunnycore.recognition.image.filter.impl.JAIFreiChenEdgeImageFilter;
 import by.sunnycore.recognition.image.filter.impl.JAIPrewittEdgeImageFilter;
 import by.sunnycore.recognition.image.filter.impl.JAIRobertsEdgeImageFilter;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class JAIEdgeImageTransformerTest {
 	@Test

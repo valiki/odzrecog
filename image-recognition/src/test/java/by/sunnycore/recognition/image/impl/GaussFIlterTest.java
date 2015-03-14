@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import by.sunnycore.recognition.image.filter.ImageFilter;
 import by.sunnycore.recognition.image.filter.impl.GaussFilter;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class GaussFIlterTest {
 

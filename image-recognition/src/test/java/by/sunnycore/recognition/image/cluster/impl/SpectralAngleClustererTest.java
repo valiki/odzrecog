@@ -10,7 +10,7 @@ import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.util.ClusteringUtil;
 import by.sunnycore.recognition.image.util.DataUtil;
 import by.sunnycore.recognition.image.util.ImageUtil;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class SpectralAngleClustererTest extends AbstractTeachableClusterizationMethodTest{
 	

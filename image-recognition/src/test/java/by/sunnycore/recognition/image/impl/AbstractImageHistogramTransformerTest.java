@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import by.sunnycore.recognition.image.histogram.impl.JAIHistogramBuilder;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public abstract class AbstractImageHistogramTransformerTest {
 	

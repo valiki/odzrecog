@@ -15,8 +15,6 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import by.sunnycore.recognition.test.TestUtil;
-
 public class ImageUtilTest {
 	private static final int TEST_IMAGE_HEIGHT = 1707;
 	private static final int TEST_IMAGE_WIDTH = 1144;

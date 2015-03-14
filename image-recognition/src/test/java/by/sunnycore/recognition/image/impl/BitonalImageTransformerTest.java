@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import by.sunnycore.recognition.image.transformer.impl.BitonalImageTransformer;
-import by.sunnycore.recognition.test.TestUtil;
+import by.sunnycore.recognition.image.util.TestUtil;
 
 public class BitonalImageTransformerTest extends AbstractImageHistogramTransformerTest{
 	@Test

@@ -16,11 +16,10 @@ import org.math.plot.Plot3DPanel;
 
 import by.sunnycore.recognition.domain.ObjectCluster;
 import by.sunnycore.recognition.image.cluster.ParamCounter;
-import by.sunnycore.recognition.test.TestUtil;
 
 public class ClusteringUtil {
 
-	public final static Color[] COLORLIST = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.PINK, Color.CYAN};
+	public final static Color[] COLORLIST = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.PINK, Color.CYAN, Color.GRAY, Color.MAGENTA, Color.YELLOW, Color.LIGHT_GRAY};
 	
 	public static int[][] markDotsWithTooLightedValues(BufferedImage source,String newName) {
 		PixelGrabber pixelGrabber = new PixelGrabber(source, 0, 0, source.getWidth(), source.getHeight(), true);
